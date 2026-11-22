@@ -25,7 +25,7 @@ import { commitForApplied, installGitHooks, prepareCommitMsg } from "../core/git
 import { blameFile, type BlameReport } from "../core/blame.ts";
 import { GuardError, assertQueryBounds, oneLine } from "../core/guard.ts";
 import { dropQuarantined, flushOutbox, listOutbox, otherOutboxPhrases, outboxSummary, requeue, unsavedSplit, writePrivateDurable, type WriteOutcome } from "../core/outbox.ts";
-import { createRuntime, normalizeRuntimeName, resolveProfile, roleForRuntimeName, stripTag, tagOf, tagged, type Runtime } from "../core/runtime.ts";
+import { createRuntime, gatewayProfileForRequest, normalizeRuntimeName, resolveProfile, roleForRuntimeName, stripTag, tagOf, tagged, type Runtime } from "../core/runtime.ts";
 import { localLegacyProbe, openProjectRegistry, PROJECT_REGISTRY_PROFILE, ProjectError, projectView, type ProjectRecord } from "../core/projects.ts";
 import { createCortexProjectStore, migrateLocalProjects, runtimeProjectTransport, type ProjectRecordTransport } from "../core/projects-cortex.ts";
 import { gatewayProjectTransport } from "../core/projects-gateway.ts";
@@ -48,6 +48,7 @@ import { GatewayClient, GatewayProfileError, GatewayUnsupportedError, loadGatewa
 import { gatewayStatus, loginGateway, logoutGateway } from "../core/gateway-enrollment.ts";
 
 import { loadConfig } from "../src/config.ts";
+import { packageVersion } from "../shared/package-version.ts";
 
 interface Args {
   as?: string;
@@ -85,13 +86,24 @@ interface Args {
   noVerify?: boolean;
   cmd: string;
   rest: string[];
+  help: boolean;
+  version: boolean;
 }
 
 function parseArgs(argv: string[]): Args {
-  const a: Args = { json: false, userConfirmed: false, share: false, ids: false, done: false, compare: false, clipboard: false, fromJson: false, once: false, cmd: "status", rest: [] };
+  const a: Args = { json: false, userConfirmed: false, share: false, ids: false, done: false, compare: false, clipboard: false, fromJson: false, once: false, cmd: "status", rest: [], help: false, version: false };
   const positional: string[] = [];
+  let literal = false;
+  let usedProjectOption = false;
+  const valueFlags = new Set("--as --project --session --to --file --fields --pii --desc --scope --evidence --from --path --cmd --hook --days --endpoint --tenant --actor --profile --api-key --as-of".split(" "));
+  const projectValues = new Set("--title --slug --workspace --rigor --provenance --expected-revision --grant".split(" "));
   for (let i = 0; i < argv.length; i++) {
     const t = argv[i];
+    if (literal) { positional.push(t); continue; }
+    if (t === "--") { literal = true; continue; }
+    if ((valueFlags.has(t) || projectValues.has(t)) && (argv[i + 1] === undefined || argv[i + 1].startsWith("-"))) throw new Error(`${t} requires a value`);
+    if (projectValues.has(t)) { usedProjectOption = true; positional.push(t, argv[++i]); continue; }
+    if (t === "--adopt") { usedProjectOption = true; positional.push(t); continue; }
     if (t === "--as") a.as = argv[++i];
     else if (t === "--project") a.project = argv[++i];
     else if (t === "--session") a.session = argv[++i];
@@ -124,12 +136,37 @@ function parseArgs(argv: string[]): Args {
     else if (t === "--compare") a.compare = true;
     else if (t === "--json") a.json = true;
     else if (t === "--user-confirmed") a.userConfirmed = true;
-    else if (t === "-h" || t === "--help") positional.push("help");
+    else if (t === "-h" || t === "--help") a.help = true;
+    else if (t === "--version" || t === "-v") a.version = true;
+    else if (t.startsWith("-")) throw new Error(`unknown option "${t}"`);
     else positional.push(t);
   }
   if (positional.length) {
     a.cmd = positional[0];
     a.rest = positional.slice(1);
+  }
+  const commands = new Set("help prompt git profiles project gateway briefing passport render recall check jit remember milestone stage capture share drop supersede close handoff pending shared resync review import evidence blame schema add later due northstar snooze done prefer prefs feedback hygiene outbox scorecard pause resume mcp status demo".split(" "));
+  if (!commands.has(a.cmd)) throw new Error(`unknown command "${a.cmd}"`);
+  const nested: Record<string, string[]> = {
+    git: ["install-hooks", "prepare-commit-msg"], profiles: ["list", "migrate-preview"],
+    project: ["help", "list", "show", "create", "bind-workspace", "grants", "rigor", "archive", "migrate"],
+    gateway: ["help", "login", "logout", "status", "tools", "briefing", "passport", "recall", "remember", "stage", "feedback", "proposals", "share", "supersede", "close", "project"],
+    schema: ["list", "propose", "approve", "retire"], prefs: ["list", "retire", "candidates", "accept", "reject"],
+    outbox: ["flush", "retry", "drop"], feedback: ["applied", "not-applicable", "outcome"],
+  };
+  const sub = a.rest[0];
+  if (nested[a.cmd] && sub && !nested[a.cmd].includes(sub)) throw new Error(`unknown ${a.cmd} subcommand "${sub}"`);
+  if (a.cmd === "gateway" && sub === "project" && a.rest[1] && !nested.project.includes(a.rest[1])) throw new Error(`unknown project subcommand "${a.rest[1]}"`);
+  const isProject = a.cmd === "project" || (a.cmd === "gateway" && sub === "project");
+  if (!isProject && usedProjectOption) throw new Error("project option requires the project command");
+  if (a.scope !== undefined && !["project", "northstar"].includes(a.scope)) throw new Error("--scope must be project or northstar");
+  if (a.days !== undefined && (!/^\d+$/.test(a.days) || Number(a.days) < 1)) throw new Error("--days must be a positive integer");
+  if (isProject) {
+    const flag = (name: string) => { const i = a.rest.indexOf(name); return i < 0 ? undefined : a.rest[i + 1]; };
+    const workspace = flag("--workspace"), rigor = flag("--rigor"), revision = flag("--expected-revision");
+    if (workspace && !["none", "pending", "bound"].includes(workspace)) throw new Error("--workspace must be none, pending, or bound");
+    if (rigor && !["T0", "T1", "T2"].includes(rigor)) throw new Error("--rigor must be T0, T1, or T2");
+    if (revision && !/^\d+$/.test(revision)) throw new Error("--expected-revision must be a non-negative integer");
   }
   return a;
 }
@@ -1501,7 +1538,8 @@ async function cmdGateway(a: Args): Promise<void> {
     if (!conn) {
       return die('the Keon MCP Gateway transport is off: set "gatewayUrl" in ~/.config/continuity/config.json to the gateway MCP endpoint (e.g. http://localhost:5000/mcp). The local direct-Cortex path is unchanged.', 5);
     }
-    client = new GatewayClient(conn);
+    const profileId = gatewayProfileForRequest(conn.profileId, a.project);
+    client = new GatewayClient({ ...conn, profileId });
     endpoint = conn.endpoint;
   } catch (e) {
     return die(errText(e), 5);
@@ -1798,6 +1836,7 @@ Agent integration
   git | blame | feedback | hygiene | scorecard
   outbox | pause | resume | status
   gateway <op>         help, login, logout, status, and memory operations
+  demo [--json]        try a synthetic handoff without credentials
 
 Use --as or CONTINUITY_RUNTIME for commands that act as an agent.
 Hosted memory requires an issued Gateway credential. See the README for setup.
@@ -1807,9 +1846,27 @@ Exit codes: 0 success, 1 error, 2 usage, 3 confirmation required, 4 unreachable,
 // ---------- main ----------
 
 async function main() {
-  const a = parseArgs(process.argv.slice(2));
+  let a: Args;
+  try { a = parseArgs(process.argv.slice(2)); } catch (e) { return die(e instanceof Error ? e.message : String(e), 2); }
+  if (a.version) {
+    try { return process.stdout.write(`${packageVersion()}\n`); } catch (e) { return die(errText(e), 1); }
+  }
+  if (a.help) {
+    const help = a.cmd === "project" || (a.cmd === "gateway" && a.rest[0] === "project") ? PROJECT_HELP : a.cmd === "gateway" ? GATEWAY_HELP : a.cmd === "demo" ? "usage: continuity demo [--json]\n\nRun a synthetic handoff entirely in memory." : a.cmd === "status" && !process.argv.slice(2).includes("status") ? HELP : `usage: continuity ${a.cmd} [options]\n\n${HELP}`;
+    return process.stdout.write(`${help}\n`);
+  }
   if (a.cmd === "help") return process.stdout.write(`${HELP}\n`);
   if (a.cmd === "prompt") return process.stdout.write(`${EXTRACTION_PROMPT}\n`);
+  if (a.cmd === "demo") {
+    if (a.rest.length) return die("usage: continuity demo [--json]", 2);
+    const { runHandoffDemo, renderHandoffDemo } = await import("../core/demo.ts");
+    try {
+      const result = await runHandoffDemo();
+      return out(a, renderHandoffDemo(result), result);
+    } catch (e) {
+      return die(errText(e), 1);
+    }
+  }
   // Local git plumbing: no Cortex, no role, no secret — it must work inside a hook with no identity.
   if (a.cmd === "git") return await cmdGit(a);
   // The profile naming registry + migration preview (TASK-85, docs/profile-naming.md) are local

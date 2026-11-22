@@ -49,6 +49,20 @@ function run(args, machineConfig, input = '') {
   });
 }
 
+test('malformed writes submit nothing and a delimiter preserves literal option-like notes', async () => {
+  const local = machine();
+  const identity = ['--as', 'codex', '--project', 'proj_arguments'];
+  const before = fake.requests.length;
+  const malformed = await run([...identity, 'remember', 'A fixture decision.', '--user-confirmed', '--ouput', 'json'], local);
+  assert.equal(malformed.code, 2, malformed.stderr);
+  assert.match(malformed.stderr, /unknown option "--ouput"/);
+  assert.equal(fake.requests.length, before);
+
+  const literal = await run([...identity, 'remember', '--user-confirmed', '--', '--example is a literal note.'], local);
+  assert.equal(literal.code, 0, literal.stderr + literal.stdout);
+  assert.ok([...fake.shards.values()].some((item) => item.content.includes('--example is a literal note.')));
+});
+
 test('the built CLI is usable and requires explicit runtime identity', async () => {
   const local = machine();
   const help = await run(['--help'], local);

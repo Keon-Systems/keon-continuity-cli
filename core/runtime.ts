@@ -13,7 +13,7 @@ import { CortexClient, grant, type CortexTransport, type Identity } from "../src
 import { loadConfig, loadSecret, type ContinuityConfig } from "../src/config.ts";
 import { assertId, slugify } from "../src/ids.ts";
 import { assertRegisteredProfileId, resolveProfileId } from "../src/profile-registry.ts";
-import { loadGatewayConnection } from "./gateway-client.ts";
+import { GatewayProfileError, loadGatewayConnection } from "./gateway-client.ts";
 import { GatewayCortexTransport } from "./gateway-transport.ts";
 import { loadState, saveState, type LocalState } from "./state.ts";
 
@@ -33,7 +33,7 @@ export interface AgentRuntimeName {
  * `pin` is local to a checkout. Remote-derived IDs can change when remotes differ, and
  * folder names can collide. `explicit` = `--project`.
  */
-export type ProfileSource = "explicit" | "pin" | "project-file" | "remote" | "toplevel" | "cwd";
+export type ProfileSource = "explicit" | "pin" | "project-file" | "remote" | "toplevel" | "cwd" | "gateway";
 
 export interface Runtime {
   cfg: ContinuityConfig;
@@ -154,6 +154,18 @@ export function actorForRuntimeName(cfg: ContinuityConfig, runtimeName: string):
   return runtimeName === "pi" ? cfg.agentActor : `agent_${runtimeName}`;
 }
 
+/** Keep an explicitly requested project consistent with the configured Gateway context. */
+export function gatewayProfileForRequest(configured?: string, requested?: string): string | undefined {
+  if (requested === undefined) return configured;
+  const canonicalRequest = resolveProfileId(assertId(requested, "profileId"));
+  if (configured && resolveProfileId(configured) !== canonicalRequest) {
+    throw new GatewayProfileError(
+      `requested project ${JSON.stringify(requested)} does not match configured Gateway profile ${JSON.stringify(configured)}; configure the intended Gateway profile before retrying. Nothing was sent.`,
+    );
+  }
+  return configured ?? canonicalRequest;
+}
+
 export async function createRuntime(opts: CreateRuntimeOptions): Promise<Runtime> {
   const cfg = loadConfig();
   const runtimeName = normalizeRuntimeName(opts.runtimeName);
@@ -173,7 +185,8 @@ export async function createRuntime(opts: CreateRuntimeOptions): Promise<Runtime
   // never degrades into a silent direct-Cortex call. With no endpoint, the local path is unchanged.
   const gatewayConn = loadGatewayConnection(cfg);
   if (gatewayConn) {
-    const gatewayProfile = gatewayConn.profileId ?? resolved.profileId;
+    const gatewayProfile = gatewayProfileForRequest(gatewayConn.profileId, opts.profileId) ?? resolved.profileId;
+    const sameProfile = resolveProfileId(gatewayProfile) === resolved.profileId;
     const actor = gatewayConn.auth.kind === "api-key" ? gatewayConn.auth.actorId : agentActor;
     const agentId: Identity = { actorId: actor, profileId: gatewayProfile, roleId: agentRole, grants: [] };
     const ownerId: Identity = { actorId: gatewayConn.auth.kind === "api-key" ? actor : cfg.ownerActor, profileId: gatewayProfile, roleId: cfg.ownerRole, grants: [] };
@@ -184,8 +197,8 @@ export async function createRuntime(opts: CreateRuntimeOptions): Promise<Runtime
       cfg,
       runtimeName,
       profileId: gatewayProfile,
-      projectLabel: resolved.label,
-      profileSource: resolved.source,
+      projectLabel: sameProfile ? resolved.label : gatewayProfile,
+      profileSource: sameProfile ? resolved.source : "gateway",
       generation,
       transport: "gateway",
       gateway: {
