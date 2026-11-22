@@ -1,0 +1,54 @@
+name: Verify release package
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.18.0'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: |
+          mkdir release
+          npm pack --ignore-scripts --pack-destination release
+          cd release
+          sha256sum *.tgz > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: continuity-cli-release
+          path: release/
+          if-no-files-found: error
+
+  install:
+    needs: package
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        node: ['22.18.0', '24']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: continuity-cli-release
+          path: release
+      - name: Verify checksum, install CLI, and run the handoff demo
+        shell: bash
+        run: npm run verify:release -- release/*.tgz release/SHA256SUMS

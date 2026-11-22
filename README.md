@@ -4,17 +4,31 @@ Continuity carries confirmed project memory between coding agents and machines. 
 
 This repository contains the standalone memory CLI and its client code. The Continuity Deck and memory services are distributed separately. [Kontinuity CLI overview](https://kontinuity.net/cli/)
 
-## Build and install
+## Install and try a handoff
 
-Use Node.js 22.18 or newer and Git on Linux, macOS, or Windows.
+Use Node.js 22.18 or newer on Linux, macOS, or Windows.
+
+Download the versioned tarball and its SHA-256 checksum from [GitHub releases](https://github.com/Keon-Systems/keon-continuity-cli/releases). Install the tarball from your download directory.
+
+~~~sh
+npm install --global ./keon-systems-continuity-cli-0.2.0.tgz
+continuity --version
+continuity demo
+~~~
+
+The demo runs in memory with two synthetic agents. It shows a private decision, a scripted confirmation, and the second agent reading the shared decision. It uses no credentials or hosted service. Use `continuity demo --json` for the structured result.
+
+### Build from source
+
+Building from source also requires Git.
 
 ~~~sh
 git clone https://github.com/Keon-Systems/keon-continuity-cli.git
 cd keon-continuity-cli
 npm ci
 npm pack
-npm install --global ./keon-systems-continuity-cli-0.1.0.tgz
-continuity --help
+npm install --global ./keon-systems-continuity-cli-0.2.0.tgz
+continuity demo
 ~~~
 
 The package provides the `continuity` and `kontinuity` commands. If you already have a Kontinuity installation providing these commands, use `node dist/cli/continuity.js --help` from this checkout to try the standalone CLI alongside it.
@@ -35,7 +49,15 @@ The CLI can also use an existing direct Cortex endpoint for local development. S
 
 ## Hand off confirmed context
 
-On the machine where an agent staged a record, inspect `pending`. Run `share` with the displayed record ID only after you have reviewed and approved it. Then load the confirmed context from the same project on the other machine.
+Replace `proj_example` with the project selected during setup. On the first machine, start by staging a fixture decision for review.
+
+~~~sh
+echo '{"decisions":[{"text":"Cap retry attempts at two.","keywords":["retry","limit","release"]}]}' | continuity --as claude --project proj_example stage
+~~~
+
+In Windows PowerShell the same pipeline works with `Write-Output` in place of `echo`.
+
+Inspect `pending`. Replace `RECORD_ID` with the displayed ID and run `share` after reviewing and approving the decision. On the second machine use its own agent identity and the same project profile. If you use Gateway, each machine needs an enrollment for its agent role.
 
 ~~~sh
 continuity --as claude --project proj_example pending
