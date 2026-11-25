@@ -4,19 +4,13 @@ Continuity carries confirmed project memory between coding agents and machines. 
 
 This repository contains the standalone memory CLI and its client code. The Continuity Deck and memory services are distributed separately. [Kontinuity CLI overview](https://kontinuity.net/cli/)
 
+The product is Kontinuity. The npm package is `@keon-systems/continuity-cli`. It provides the `continuity` and `kontinuity` commands, which run the same CLI.
+
 ## Install and try a handoff
 
 Use Node.js 22.18 or newer on Linux, macOS, or Windows.
 
-Download the versioned tarball and its SHA-256 checksum from [GitHub releases](https://github.com/Keon-Systems/keon-continuity-cli/releases). Install the tarball from your download directory.
-
-~~~sh
-npm install --global ./keon-systems-continuity-cli-0.2.0.tgz
-continuity --version
-continuity demo
-~~~
-
-The demo runs in memory with two synthetic agents. It shows a private decision, a scripted confirmation, and the second agent reading the shared decision. It uses no credentials or hosted service. Use `continuity demo --json` for the structured result.
+Release downloads are not yet published. The repository has no GitHub releases or tags yet. The v0.2.0 release stays unpublished until the [hosted handoff release gate](docs/hosted-release-verification.md) passes. Build from source to try the CLI today.
 
 ### Build from source
 
@@ -28,10 +22,13 @@ cd keon-continuity-cli
 npm ci
 npm pack
 npm install --global ./keon-systems-continuity-cli-0.2.0.tgz
+continuity --version
 continuity demo
 ~~~
 
-The package provides the `continuity` and `kontinuity` commands. If you already have a Kontinuity installation providing these commands, use `node dist/cli/continuity.js --help` from this checkout to try the standalone CLI alongside it.
+The demo runs in memory with two synthetic agents. It shows a private decision, a scripted confirmation, and the second agent reading the shared decision. It uses no credentials or hosted service. Use `continuity demo --json` for the structured result.
+
+If you already have a Kontinuity installation providing these commands, use `node dist/cli/continuity.js --help` from this checkout to try the standalone CLI alongside it.
 
 ## Connect to shared memory
 
