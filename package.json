@@ -1,20 +1,20 @@
 {
-  "name": "@keon-systems/continuity-cli",
+  "name": "@keon-systems/kontinuity-cli",
   "version": "0.2.0",
-  "description": "Continuity shared project memory CLI for coding agents",
+  "description": "Kontinuity shared project memory CLI for coding agents",
   "type": "module",
   "license": "Apache-2.0",
   "homepage": "https://kontinuity.net/cli/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Keon-Systems/keon-continuity-cli.git"
+    "url": "git+https://github.com/Keon-Systems/keon-kontinuity-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/Keon-Systems/keon-continuity-cli/issues"
+    "url": "https://github.com/Keon-Systems/keon-kontinuity-cli/issues"
   },
   "bin": {
-    "continuity": "dist/cli/continuity.js",
-    "kontinuity": "dist/cli/continuity.js"
+    "kontinuity": "dist/cli/continuity.js",
+    "continuity": "dist/cli/continuity.js"
   },
   "files": ["dist", "README.md", "LICENSE", "NOTICE"],
   "engines": {

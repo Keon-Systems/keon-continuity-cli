@@ -767,7 +767,7 @@ export async function migrateLocalProjects(opts: {
           state: "local-only",
           grantsDropped,
           outcome: "publishable",
-          ...(grantsDropped.length > 0 ? { reason: `satellite grants ${grantsDropped.join(", ")} are NOT carried across — re-confirm with \`continuity project grants\` after migration` } : {}),
+          ...(grantsDropped.length > 0 ? { reason: `satellite grants ${grantsDropped.join(", ")} are NOT carried across — re-confirm with \`kontinuity project grants\` after migration` } : {}),
         });
         continue;
       }
@@ -784,7 +784,7 @@ export async function migrateLocalProjects(opts: {
           state: "local-only",
           grantsDropped,
           outcome: "published",
-          ...(grantsDropped.length > 0 ? { reason: `satellite grants ${grantsDropped.join(", ")} were dropped to empty — re-confirm with \`continuity project grants\`` } : {}),
+          ...(grantsDropped.length > 0 ? { reason: `satellite grants ${grantsDropped.join(", ")} were dropped to empty — re-confirm with \`kontinuity project grants\`` } : {}),
         });
       } catch (e) {
         const mapped = mapRegistryWriteError(e, row);

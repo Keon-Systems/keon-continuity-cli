@@ -12,7 +12,7 @@ export interface AsOfRecord {
   status: string;
 }
 
-/** A supersede Continuity recorded: `toId` replaced this record and became current at `at`. */
+/** A supersede Kontinuity recorded: `toId` replaced this record and became current at `at`. */
 export interface SupersedeLink {
   toId: string;
   at: string;

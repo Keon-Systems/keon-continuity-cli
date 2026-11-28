@@ -74,7 +74,7 @@ export interface BriefingOptions {
   /** Append a short record id to each line so the agent can report applied / not-applicable / outcome. */
   showIds?: boolean;
   /**
-   * Only user-confirmed (shared) memory — for `continuity render`, which writes the briefing into
+   * Only user-confirmed (shared) memory — for `kontinuity render`, which writes the briefing into
    * files (AGENTS.md & co.) that every tool reads. Private notes and per-session state are left
    * out: unconfirmed inferences of one runtime must never leak into files read by all the others.
    */
@@ -255,7 +255,7 @@ const byRecency = (a: BriefingShard, b: BriefingShard): number =>
   a.id.localeCompare(b.id);
 
 export function briefingTitle(projectLabel: string, confirmedOnly = false): string {
-  return `## Continuity briefing — ${oneLine(projectLabel, 80)}${confirmedOnly ? " (confirmed memory only)" : ""}`;
+  return `## Kontinuity briefing — ${oneLine(projectLabel, 80)}${confirmedOnly ? " (confirmed memory only)" : ""}`;
 }
 
 /**
@@ -303,7 +303,7 @@ export function sessionStartLine(briefing: Pick<Briefing, "text" | "sharedCount"
 // `[open-loop]` sit on a large fraction of a tenant, so that single recall was ~4,700 shards and
 // ~11 MB, past the 8s client timeout (core/runtime.ts). `buildBriefing` does not send that union.
 //
-// The raw gateway briefing (`continuity gateway briefing`) still does: the gateway recall contract
+// The raw gateway briefing (`kontinuity gateway briefing`) still does: the gateway recall contract
 // is one request, and `buildBriefing` refuses the gateway transport.
 export const BRIEFING_QUERY = "[decision] [rejected] [open-loop] [closed] [lesson] [note] [imported] [handoff]";
 
@@ -431,7 +431,7 @@ function groupByOwner(ids: Iterable<string>, owner: Map<string, string>): Map<st
  * "Memory the user confirmed". Both are dishonest, so this fails closed and names the gap.
  */
 export const BRIEFING_GATEWAY_GAP =
-  "continuity briefing is not available on the Keon MCP Gateway transport: the Gateway read contract does not return a record's scope (role_private vs profile_shared) or its provenance, and a briefing must never present an unconfirmed inference as user-confirmed memory. Nothing was read. Use `continuity gateway briefing` for a raw gateway recall, or run against Cortex (no gateway endpoint enrolled on this machine).";
+  "kontinuity briefing is not available on the Keon MCP Gateway transport: the Gateway read contract does not return a record's scope (role_private vs profile_shared) or its provenance, and a briefing must never present an unconfirmed inference as user-confirmed memory. Nothing was read. Use `kontinuity gateway briefing` for a raw gateway recall, or run against Cortex (no gateway endpoint enrolled on this machine).";
 
 /**
  * Local state written after a briefing (deliveries, consumed batons, the scorecard) is
@@ -546,7 +546,7 @@ export async function buildBriefing(rt: Runtime, sessionId: string, opts: Briefi
   const lines: string[] = [];
   const included: string[] = [];
   let used = 0;
-  const omissionNotice = (n: number) => `(+${n} more record(s) left out to stay within the briefing budget; use \`continuity recall <words>\` to look for them.)`;
+  const omissionNotice = (n: number) => `(+${n} more record(s) left out to stay within the briefing budget; use \`kontinuity recall <words>\` to look for them.)`;
   // An outbox warning must not force an unbounded footer. Reserve the largest possible
   // memory-omission notice as well, so operational-only and crowded briefings obey the cap.
   const maxOmitted = details.length + prefItems.length;
@@ -568,7 +568,7 @@ export async function buildBriefing(rt: Runtime, sessionId: string, opts: Briefi
   for (const line of front) push(line); // trust preamble + rules constrain the agent's first action
   if (ob?.total) {
     const split = unsavedSplit(rt.cfg.tenantId, rt.runtimeName);
-    const full = `${split.total} captured item(s) are NOT saved yet (waiting to reach memory${ob.indeterminate ? `; ${ob.indeterminate} unconfirmed` : ""})${ob.quarantined ? `; ${ob.quarantined} refused and need attention` : ""}${split.clause ? `: ${split.clause}` : ""}. Do not claim they were remembered. \`continuity outbox\`.`;
+    const full = `${split.total} captured item(s) are NOT saved yet (waiting to reach memory${ob.indeterminate ? `; ${ob.indeterminate} unconfirmed` : ""})${ob.quarantined ? `; ${ob.quarantined} refused and need attention` : ""}${split.clause ? `: ${split.clause}` : ""}. Do not claim they were remembered. \`kontinuity outbox\`.`;
     // Priority operational capacity, BEFORE memory/delta bodies. Two hard limits bound the
     // inline owner list: the configured byte cap (push below) and the MCP transport, which
     // flattens every briefing line through oneLine(line, MAX_CONTENT_BYTES) (core/mcp.ts
@@ -618,7 +618,7 @@ export async function buildBriefing(rt: Runtime, sessionId: string, opts: Briefi
     // lines, or '+N more' counts). What is genuinely gone is a supersede/closure's old → new
     // gloss — that is what the pointer fetches. Never point an agent at text it is about to read.
     if (hidden > 0) {
-      const gloss = hiddenPairs > 0 ? "; `continuity recall <words>` for the old → new gloss" : "";
+      const gloss = hiddenPairs > 0 ? "; `kontinuity recall <words>` for the old → new gloss" : "";
       push(`+${hidden} more change${hidden === 1 ? "" : "s"} since ${delta.since} — their current records ride below${gloss}`);
     }
   }
@@ -684,12 +684,12 @@ export async function buildBriefing(rt: Runtime, sessionId: string, opts: Briefi
       const tasks = body.filter((d) => d.tag === "open-loop").map((d) => parseTask(d.content)).filter((t) => t !== undefined);
       const avail = new Set(tasks.filter((t) => t.status === "available").map((t) => t.n)).size;
       const taskPart = avail > 0 ? ` (${avail} task${avail === 1 ? "" : "s"} available)` : "";
-      const boardPart = tasks.length > 0 ? " · `continuity task board`" : "";
+      const boardPart = tasks.length > 0 ? " · `kontinuity task board`" : "";
       line = `- ${hintNoun(tag, ids.length, capped)}${taskPart} — continuity recall "[${t}]"${boardPart}`;
     }
     if (push(oneLine(line))) for (const id of ids) summarizedIds.add(id);
   }
-  if (shared.length === 0) push(opts.confirmedOnly ? NO_CONFIRMED_LINE : `- (none yet — ${rt.runtimeName === "pi" ? "use /continuity save or /continuity remember" : "`continuity remember … --user-confirmed` for what the user says, or `continuity stage` for what you infer"})`);
+  if (shared.length === 0) push(opts.confirmedOnly ? NO_CONFIRMED_LINE : `- (none yet — ${rt.runtimeName === "pi" ? "use /continuity save or /continuity remember" : "`kontinuity remember … --user-confirmed` for what the user says, or `kontinuity stage` for what you infer"})`);
   let prefsPushed = 0;
   if (prefItems.length > 0) {
     push(`User-confirmed life/preference profile (cross-project — these apply in every project and runtime):`);
@@ -701,9 +701,9 @@ export async function buildBriefing(rt: Runtime, sessionId: string, opts: Briefi
   if (!opts.confirmedOnly && priv.length > 0) {
     push(`This agent's own unconfirmed notes (not visible to other agents; treat as hints, not facts):`);
     // Hint + pointer (docs/briefing.md): the count, never the bodies — unconfirmed inferences of
-    // one runtime are fetched with `continuity pending`, not injected.
+    // one runtime are fetched with `kontinuity pending`, not injected.
     const ids = priv.filter((d) => !warnedIds.has(d.id)).map((d) => d.id);
-    if (push(`- ${ids.length} unconfirmed note${ids.length === 1 ? "" : "s"} — \`continuity pending\``)) for (const id of ids) summarizedIds.add(id);
+    if (push(`- ${ids.length} unconfirmed note${ids.length === 1 ? "" : "s"} — \`kontinuity pending\``)) for (const id of ids) summarizedIds.add(id);
   }
   if (!opts.confirmedOnly && due.length > 0) {
     push(`Deferred ideas now due for revisit (the user asked to be reminded; raise them once, briefly):`);
@@ -715,9 +715,9 @@ export async function buildBriefing(rt: Runtime, sessionId: string, opts: Briefi
   } else if (!opts.confirmedOnly && upcoming.length > 0) {
     push(`${upcoming.length} deferred idea(s) on the north star; next revisit ${upcoming[0].revisit}.`);
   }
-  // Vocabulary is dropped from the briefing to `continuity status` ([decision] 2026-11-03).
+  // Vocabulary is dropped from the briefing to `kontinuity status` ([decision] 2026-11-03).
   const pending = rt.state.pending.length;
-  const reviewHint = rt.runtimeName === "pi" ? "/continuity review" : "`continuity pending`";
+  const reviewHint = rt.runtimeName === "pi" ? "/continuity review" : "`kontinuity pending`";
   if (!opts.confirmedOnly && pending > 0) push(`${pending} inferred item(s) await the user's review (${reviewHint}).`);
   // The order statement moved to docs (docs/briefing.md) — no ORDER_LINE footer any more.
 
@@ -960,14 +960,14 @@ export async function buildBriefingAsOf(rt: Runtime, sessionId: string, asOf: st
   // Appended outside the budget on purpose: the honesty note about unplaceable records must
   // never be silently dropped by the same cap it is reporting around.
   if (view.unplaced.length > 0) {
-    lines.push(`+${view.unplaced.length} record(s) cannot be placed at ${asOf}: your records do not say when they were superseded — \`continuity recall <words>\` will show them.`);
+    lines.push(`+${view.unplaced.length} record(s) cannot be placed at ${asOf}: your records do not say when they were superseded — \`kontinuity recall <words>\` will show them.`);
   }
   if (recall.truncatedTags.size > 0) {
     const tags = [...recall.truncatedTags].map((tag) => `"[${tag}]"`).join(", ");
-    lines.push(`+more ${tags} records were not loaded — each tag recall is capped; \`continuity recall <tag>\` for the rest.`);
+    lines.push(`+more ${tags} records were not loaded — each tag recall is capped; \`kontinuity recall <tag>\` for the rest.`);
   }
   const omittedForBudget = shared.length + priv.length - included.length;
-  if (omittedForBudget > 0) lines.push(`(+${omittedForBudget} more record(s) left out to stay within the briefing budget; use \`continuity recall <words>\` to look for them.)`);
+  if (omittedForBudget > 0) lines.push(`(+${omittedForBudget} more record(s) left out to stay within the briefing budget; use \`kontinuity recall <words>\` to look for them.)`);
   push(RULES_LINE);
 
   const text = lines.join("\n");

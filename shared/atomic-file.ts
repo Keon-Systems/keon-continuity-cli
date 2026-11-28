@@ -2,8 +2,8 @@
  * Publish a file by renaming a temp in the same directory over the destination.
  *
  * On Windows, `rename` of an existing file fails with EPERM, EACCES, or EBUSY while
- * another process has the destination open — a reader such as `continuity deck` or
- * `continuity mcp`, or antivirus and the search indexer. The failure is transient.
+ * another process has the destination open — a reader such as `kontinuity deck` or
+ * `kontinuity mcp`, or antivirus and the search indexer. The failure is transient.
  * graceful-fs retries those three codes, yielding between attempts so the locker can
  * finish (isaacs/node-graceful-fs `polyfills.js`, the win32 `fs.rename` patch). That
  * patch waits up to 60 seconds and only retries when the destination is absent, which

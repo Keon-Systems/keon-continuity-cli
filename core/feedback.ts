@@ -50,7 +50,7 @@ export function recordDelivery(rt: Runtime, d: DeliveryRecord): void {
 }
 
 /**
- * Journal what was reported, locally and bounded, so `continuity hygiene` can compute its
+ * Journal what was reported, locally and bounded, so `kontinuity hygiene` can compute its
  * read-only queue from state.deliveries and this feedback without reading events back from
  * Cortex (there is no such read) or writing anything. A replay (409) is never journaled:
  * the same fact is recorded once, so "repeated not-applicable" means distinct reports.
@@ -122,7 +122,7 @@ export async function reportOutcome(
   if ((st === "success" || st === "failure") && !evidenceRef) {
     throw new Error(
       `outcome ${st} needs --evidence <ref> (a path, URL or id someone can check). ` +
-        `With 'continuity git install-hooks' the commit carrying the Continuity-Applied trailer is found automatically. ` +
+        `With 'kontinuity git install-hooks' the commit carrying the Continuity-Applied trailer is found automatically. ` +
         `If you did not observe the result, report "unknown"; if nothing ran, "not_executed".`,
     );
   }

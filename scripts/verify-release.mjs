@@ -32,9 +32,9 @@ try {
   writeFileSync(join(scratch, 'package.json'), JSON.stringify({
     private: true,
     scripts: {
-      'version:primary': 'continuity --version',
-      'version:alias': 'kontinuity --version',
-      'demo:installed': 'continuity demo --json',
+      'version:primary': 'kontinuity --version',
+      'version:alias': 'continuity --version',
+      'demo:installed': 'kontinuity demo --json',
     },
   }));
   run(['install', '--offline', '--no-audit', '--no-fund', '--no-package-lock', tarball]);

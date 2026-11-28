@@ -2,7 +2,7 @@
  * Git evidence for applied memory. Two halves of one loop:
  *
  *   1. `feedback applied` records what was applied this session (locally, in state.applied).
- *      A prepare-commit-msg hook (installed by `continuity git install-hooks`) appends
+ *      A prepare-commit-msg hook (installed by `kontinuity git install-hooks`) appends
  *      `Continuity-Applied: <id>` trailers for exactly those records, so the commit itself
  *      carries the evidence of what memory shaped it.
  *   2. `feedback outcome … success|failure` without --evidence finds that commit and uses its
@@ -145,7 +145,7 @@ export interface PrepareCommitMsgResult {
  * squashes are left alone because no single application shaped them.
  */
 export async function prepareCommitMsg(opts: { cwd: string; msgFile: string; source?: string; sessionId?: string }): Promise<PrepareCommitMsgResult> {
-  if (!opts.msgFile) throw new Error("usage: continuity git prepare-commit-msg <msgfile> [source]");
+  if (!opts.msgFile) throw new Error("usage: kontinuity git prepare-commit-msg <msgfile> [source]");
   if (opts.source === "merge" || opts.source === "squash") return { added: [], skipped: 0 };
   const message = readFileSync(opts.msgFile, "utf8");
   const cfg = loadConfig();
@@ -222,7 +222,7 @@ export function hookScript(nodeBin: string, cliPath: string): string {
     "#!/bin/sh",
     HOOK_MARKER,
     "# Appends 'Continuity-Applied: <id>' trailers for records reported applied this session.",
-    "# Installed by 'continuity git install-hooks'. Local only, best effort: never fails a commit.",
+    "# Installed by 'kontinuity git install-hooks'. Local only, best effort: never fails a commit.",
     `CHAIN="$(dirname "$0")/${PRE_CONTINUITY}"`,
     'if [ -x "$CHAIN" ]; then "$CHAIN" "$@"; fi',
   ];

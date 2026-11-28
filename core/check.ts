@@ -65,7 +65,7 @@ const GENERIC = new Set(
   should since some such than that their theirs them then there these they this those through
   under until very what when where which while who whom whose why will with within without would
   your yours
-  continuity memory memories record records agent agents runtime runtimes session sessions user
+  kontinuity memory memories record records agent agents runtime runtimes session sessions user
   users project projects task tasks note notes open loop loops lesson lessons decision decisions
   rejected imported preference preferences shared private briefing recall remember stage review
   check tool tools file files path paths command commands test tests testing core src docs index

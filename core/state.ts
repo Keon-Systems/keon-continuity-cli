@@ -52,7 +52,7 @@ export interface SharedItem {
 }
 
 /**
- * A pending item the user deliberately dropped from review (`continuity drop`, an offerings
+ * A pending item the user deliberately dropped from review (`kontinuity drop`, an offerings
  * dismissal, or either Second Opinion resolution — keep the shared one drops the note;
  * superseding the shared one with the note spends it). The shard stays private in Cortex —
  * a drop is local review state — so a resync consults this ledger instead of resurrecting
@@ -165,7 +165,7 @@ export interface MadeOnRecord {
 
 /**
  * One feedback report this machine made about a delivered record. The journal exists so
- * `continuity hygiene` can compute its read-only queue locally: Cortex records feedback as
+ * `kontinuity hygiene` can compute its read-only queue locally: Cortex records feedback as
  * memory events but exposes no read for them, and hygiene must not write anything to find out
  * what was already reported. Bounded like deliveries; a replay (409) is never journaled twice.
  */
@@ -190,7 +190,7 @@ export const MAX_DROPPED = 500;
 export const MAX_SNOOZED = 500;
 
 // ----- scorecard accounting (docs/validation.md) -----
-// A local, append-only event journal so `continuity scorecard` can compute the pilot metrics
+// A local, append-only event journal so `kontinuity scorecard` can compute the pilot metrics
 // from local state. Purely descriptive counts: it changes no ranking and no behavior.
 
 export type MetricSource = "briefing" | "recall" | "jit" | "render";
@@ -225,7 +225,7 @@ export interface LocalState {
    */
   lastCapture?: { sessionId: string; count: number; at: string };
   lastResurfaced?: string;
-  /** Session id `continuity jit --once` last delivered to, so hook harnesses get JIT on the FIRST user prompt only. */
+  /** Session id `kontinuity jit --once` last delivered to, so hook harnesses get JIT on the FIRST user prompt only. */
   lastJitSession?: string;
 }
 
@@ -449,7 +449,7 @@ export function saveState(tenantId: string, profileId: string, state: LocalState
   const p = statePath(tenantId, profileId);
   mkdirSync(join(STATE_ROOT, tenantId), { recursive: true, mode: 0o700 });
   withLock(p, () => {
-    // Forward-compatible: never drop keys another version of Continuity wrote into this file.
+    // Forward-compatible: never drop keys another version of Kontinuity wrote into this file.
     // Installs and parallel worktrees share it; a blind overwrite silently destroys their state —
     // so merge our changes over whatever is on disk NOW (see the three-way merge above).
     let disk: Record<string, unknown> = {};

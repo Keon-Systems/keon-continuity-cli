@@ -1,6 +1,6 @@
 // Adapted from Keon Kontinuity for the standalone CLI.
 /**
- * The memory operations Continuity performs, mapped onto Cortex primitives:
+ * The memory operations Kontinuity performs, mapped onto Cortex primitives:
  *   writePrivate  → POST /v1/shards as the agent role (role_private)
  *   share         → propose (agent) + approve (owner) → derived profile_shared record
  *   supersede     → propose (agent) + supersede (owner) → replacement record, history kept
@@ -357,7 +357,7 @@ export async function sendBaton(rt: Runtime, w: { toRuntime: string; toRole: str
  * - Lexical, never semantic — the same contract as core/compare.ts (whose tokeniser and
  *   overlap coefficient this reuses, so both views agree on "overlapping"): a hint is where
  *   to look, not a verdict that two records contradict. The hint quotes the LIVE record's
- *   own tag and id, so `continuity supersede <id> <text>` is the offered next step.
+ *   own tag and id, so `kontinuity supersede <id> <text>` is the offered next step.
  * - Warn-only: the write always proceeds. The hint is a question for the human, not a block
  *   (memory grants no authority; a blocking check would also break byte-identical outbox
  *   replays and automated capture).
@@ -433,7 +433,7 @@ export async function preWriteCheck(rt: Runtime, content: string): Promise<PreWr
   const threshold = contradictionThreshold(rt);
   const mine = contentTokens(content);
   // Local state first: one state file per tenant+profile is shared by every runtime on this
-  // machine, and its derived ids are what `continuity supersede <id>` resolves. Keyed by
+  // machine, and its derived ids are what `kontinuity supersede <id>` resolves. Keyed by
   // exact content so a record seen both locally and in Cortex is one candidate.
   const live = new Map<string, LiveRecord>();
   for (const s of rt.state.shared) {

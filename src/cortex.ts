@@ -5,7 +5,7 @@
  * builds the carriage headers for one identity, mints operation/receipt ids,
  * and surfaces Cortex's fail-closed errors as typed exceptions.
  *
- * Two identities matter for Continuity (see SKETCH-wave0.md §2):
+ * Two identities matter for Kontinuity (see SKETCH-wave0.md §2):
  *   - the agent role (writes role-private shards, proposes curation)
  *   - the owner role (approves curation → profile_shared)
  * Use `client.as(identity)` to switch; config/secret are shared.
@@ -45,16 +45,16 @@ export const grant = {
 
 export type MemoryType = "claim" | "belief" | "lesson" | "fact" | "story" | "observation" | "decision" | "artifact_link";
 
-/** Continuity's provenance kinds — who turned this into a durable record. Bounded tokens (T-35 alphabet). */
+/** Kontinuity's provenance kinds — who turned this into a durable record. Bounded tokens (T-35 alphabet). */
 export type ProvenanceKind = "agent_inferred" | "user_said" | "user_confirmed" | "imported";
 
 /**
  * Cortex `CandidateProvenance` (ingress/models.py). `source` and `tenantId` are
  * required by the schema; the client fills `tenantId` from the connection.
- *   - sourceKind    → Continuity's ProvenanceKind (bounded identifier token)
+ *   - sourceKind    → Kontinuity's ProvenanceKind (bounded identifier token)
  *   - sourceUri     → `https://…` or `urn:…` only; we use `urn:continuity:<runtime>:<session>:<entry>`
  *   - checkpointAt  → EVENT time (when it was said/decided) — Cortex's own row time is system time.
- *   - extra         → free-form; Continuity puts captured_by / continuity_version here.
+ *   - extra         → free-form; Kontinuity puts captured_by / continuity_version here.
  */
 export interface Provenance {
   source: string;
@@ -241,7 +241,7 @@ export interface DispositionResult {
   [k: string]: unknown;
 }
 
-/** GET /v1/shards/{id} — the fields Continuity renders as the provenance ribbon. */
+/** GET /v1/shards/{id} — the fields Kontinuity renders as the provenance ribbon. */
 export interface ShardDetail {
   shard_id: string;
   content: string;
@@ -495,7 +495,7 @@ export interface CorrectionReport {
 }
 
 /**
- * What Continuity's core needs from a memory backend (TASK-196).
+ * What Kontinuity's core needs from a memory backend (TASK-196).
  *
  * Two implementations exist:
  *   - `CortexClient` (this file) — direct Cortex HTTP, the local/dev path.

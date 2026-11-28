@@ -2,7 +2,7 @@
  * Memory items: the extraction contract shared by every runtime.
  *   - pi: the extension calls a model with EXTRACTION_PROMPT and parses the reply.
  *   - other harnesses: the agent IS the model; the skill tells it to produce this JSON
- *     itself and hand it to `continuity stage`.
+ *     itself and hand it to `kontinuity stage`.
  */
 
 import type { Tag } from "./runtime.ts";

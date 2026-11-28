@@ -152,7 +152,7 @@ export const flushCommandFor = (runtime: string): string => `continuity --as ${r
 /**
  * "N belongs to codex (profile proj_x) — codex must run `continuity --as codex outbox flush`" —
  * one phrase per other runtime. Counts, runtime names, profiles and commands only: never entry
- * content (that stays behind `continuity outbox`).
+ * content (that stays behind `kontinuity outbox`).
  */
 export function otherOutboxPhrases(others: { runtime: string; profiles: string[]; unsaved: number }[]): string[] {
   return others.map((o) => {
@@ -320,7 +320,7 @@ export async function writePrivateDurable(rt: Runtime, w: WriteInput, opts: { pe
   w = await withCaptureBranch(w);
   const tenantId = rt.cfg.tenantId;
   if (listOutbox(tenantId).length >= OUTBOX_MAX_ENTRIES) {
-    throw new Error(`outbox is full (${OUTBOX_MAX_ENTRIES} entries, quarantined ones included). Run \`continuity outbox\` to inspect, \`continuity outbox flush\` to deliver, or \`continuity outbox drop <id>\` for quarantined entries. Nothing was captured.`);
+    throw new Error(`outbox is full (${OUTBOX_MAX_ENTRIES} entries, quarantined ones included). Run \`kontinuity outbox\` to inspect, \`kontinuity outbox flush\` to deliver, or \`kontinuity outbox drop <id>\` for quarantined entries. Nothing was captured.`);
   }
   const entry: OutboxEntry = {
     version: 1,

@@ -19,7 +19,7 @@ function run(...args) {
 }
 test('help and package version work without identity or configuration', () => {
   for (const args of [['--help'], ['remember', '--help'], ['project', 'create', '--help'], ['gateway', 'login', '--help'], ['gateway', 'project', 'create', '--help'], ['demo', '--help']]) {
-    const r = run(...args); assert.equal(r.status, 0, r.stderr); assert.match(r.stdout, /continuity/); assert.deepEqual(r.files, []);
+    const r = run(...args); assert.equal(r.status, 0, r.stderr); assert.match(r.stdout, /kontinuity/); assert.deepEqual(r.files, []);
   }
   for (const args of [['--version'], ['remember', '--version']]) assert.equal(run(...args).stdout.trim(), version);
 });

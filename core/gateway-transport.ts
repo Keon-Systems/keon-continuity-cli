@@ -1,8 +1,8 @@
 /**
  * Gateway-backed memory transport (TASK-196).
  *
- * `GatewayCortexTransport` implements Continuity's `CortexTransport` seam (src/cortex.ts) on top
- * of the Keon MCP Gateway client (core/gateway-client.ts), so that ORDINARY Continuity commands
+ * `GatewayCortexTransport` implements Kontinuity's `CortexTransport` seam (src/cortex.ts) on top
+ * of the Keon MCP Gateway client (core/gateway-client.ts), so that ORDINARY Kontinuity commands
  * (`recall`, `remember`, `stage`, `board`, `feedback`, `evidence`, `blame`, `delta`, …) can run
  * against the hosted Gateway instead of direct Cortex. `createRuntime` selects it whenever a
  * gateway endpoint + machine credential are configured (core/runtime.ts).
@@ -36,10 +36,10 @@
  *
  *   G-6  The write contract carries no provenance block and no client idempotency key. A
  *        gateway write therefore loses source_kind / source_uri / checkpoint_at / capture branch
- *        and the local idempotency key. Continuity still writes the content and its label keys.
+ *        and the local idempotency key. Kontinuity still writes the content and its label keys.
  *   G-7  Reads do not return the shard's scope (`role_private` vs `profile_shared`) or its full
  *        provenance: `memory.search` rows and `receipt.get` carry content/status/source only.
- *        Because a briefing renders "memory the user confirmed", `continuity briefing` refuses to
+ *        Because a briefing renders "memory the user confirmed", `kontinuity briefing` refuses to
  *        run on this transport rather than mislabel a private note as confirmed
  *        (core/briefing.ts BRIEFING_GATEWAY_GAP). `recall` still works: it labels rows with what
  *        the contract does provide and never claims a scope it cannot see.
@@ -67,10 +67,10 @@ export const GATEWAY_READ_TOOLS = {
 } as const;
 
 /**
- * `keon.cortex.memory_write_request.v1` narrows `memory_type` to this enum, while Continuity's
+ * `keon.cortex.memory_write_request.v1` narrows `memory_type` to this enum, while Kontinuity's
  * local classifier also emits `observation`, `decision` and `artifact_link`. A type the write
  * contract cannot carry is OMITTED (never coerced into a different meaning): the content's
- * bracketed tag still records what Continuity classified it as.
+ * bracketed tag still records what Kontinuity classified it as.
  */
 const GATEWAY_MEMORY_TYPES = new Set(["claim", "belief", "lesson", "fact", "story"]);
 
@@ -98,7 +98,7 @@ function eventResult(f: GatewayFeedbackResult): MemoryEventResult {
 }
 
 /**
- * One enrolled machine's transport: the Gateway client plus the LOCAL identity labels Continuity
+ * One enrolled machine's transport: the Gateway client plus the LOCAL identity labels Kontinuity
  * uses for state paths, provenance text and rendering. On this transport the Gateway binds the
  * real identity from the machine credential + enrollment; `as()` only switches the profile a call
  * is made in (`profile_id`), which the Gateway checks against the enrollment's AllowedProfiles.

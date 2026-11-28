@@ -1,7 +1,7 @@
 /**
  * The machine gateway credential store (TASK-196).
  *
- * `continuity gateway login` enrolls ONE machine credential into this store; every ordinary
+ * `kontinuity gateway login` enrolls ONE machine credential into this store; every ordinary
  * command then reaches the Keon MCP Gateway with it. The credential is a secret and never lives
  * in `config.json` (which is a plain, non-secret file): the store is a dedicated file whose
  * permissions are restricted to the current user on every platform this runs on.
@@ -68,7 +68,7 @@ export function gatewayCredentialPath(): string {
 }
 
 function credentialError(message: string, path: string): GatewayCredentialError {
-  return new GatewayCredentialError(`${message} (${path}). Run \`continuity gateway login\` to enroll this machine again.`, path);
+  return new GatewayCredentialError(`${message} (${path}). Run \`kontinuity gateway login\` to enroll this machine again.`, path);
 }
 
 function assertEndpoint(value: unknown, path: string): string {
@@ -190,6 +190,6 @@ export function credentialPermissions(path: string = gatewayCredentialPath()): {
   if (!existsSync(path)) return { ok: "unknown", detail: "no stored credential" };
   if (process.platform === "win32") return { ok: "unknown", detail: "Windows ACLs are enforced at write time (icacls); cannot inspect portably" };
   const mode = statSync(path).mode & 0o777;
-  if ((mode & 0o077) !== 0) return { ok: false, detail: `mode ${mode.toString(8)} is readable by other local users — re-run \`continuity gateway login\` (or chmod 600 ${path})` };
+  if ((mode & 0o077) !== 0) return { ok: false, detail: `mode ${mode.toString(8)} is readable by other local users — re-run \`kontinuity gateway login\` (or chmod 600 ${path})` };
   return { ok: true, detail: `mode ${mode.toString(8)} (user-only)` };
 }

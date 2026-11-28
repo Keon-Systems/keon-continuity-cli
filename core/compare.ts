@@ -1,5 +1,5 @@
 /**
- * Owner-only second-opinion view (`continuity review --compare`).
+ * Owner-only second-opinion view (`kontinuity review --compare`).
  *
  * Two lexical-overlap hints for the HUMAN OWNER deciding what to confirm:
  *
@@ -23,7 +23,7 @@
  * Owner-role recall across all role grants is CONFIG, not a Cortex ask. Verified
  * against keon-cortex `tenancy/scope.py`:
  *   - `X-Keon-Grant-Scopes` is trusted carriage once the Gateway secret is
- *     authenticated (api.py `_caller_scope`), and Continuity holds that secret;
+ *     authenticated (api.py `_caller_scope`), and Kontinuity holds that secret;
  *   - `effective_scopes()` keeps every supplied `role:{profile}:{role}` token
  *     (only misplaced `op:legacy` and foreign `handoff:` tokens are refused);
  *   - `is_visible()`: a `role_private` record is visible to "a caller holding
@@ -46,7 +46,7 @@ import { agentRoleFor, stripTag, type Runtime } from "./runtime.ts";
 export const OVERLAP_MIN = 0.55;
 export const MIN_SHARED_TOKENS = 3;
 
-/** The tag tokens every Continuity record carries — the same collision-free briefing key the briefing uses. */
+/** The tag tokens every Kontinuity record carries — the same collision-free briefing key the briefing uses. */
 const COMPARE_QUERY = "[decision] [rejected] [open-loop] [lesson] [note] [imported]";
 
 /** Runtimes whose roles are always part of the owner scan. Anything else is picked up from local state. */
@@ -240,7 +240,7 @@ export function contradictionPairs(notes: CompareNote[], confirmed: ConfirmedRec
 }
 
 /**
- * Note ids the owner already resolved out of review — the drop ledger (`continuity drop`,
+ * Note ids the owner already resolved out of review — the drop ledger (`kontinuity drop`,
  * an offerings dismissal, or either Second Opinion resolution). A resolved note never
  * reappears in a report: its private shard stays in Cortex and the owner scan would
  * otherwise re-pair it as a fresh second opinion on every run.
@@ -310,7 +310,7 @@ export async function buildCompare(rt: Runtime, sessionId: string): Promise<Comp
 const shortId = (id: string) => id.slice(0, 12);
 
 export function formatCompare(r: CompareReport): string {
-  const lines: string[] = ["## Continuity review --compare — owner view (second opinion)", r.disclaimer, ""];
+  const lines: string[] = ["## Kontinuity review --compare — owner view (second opinion)", r.disclaimer, ""];
   if (r.degraded) lines.push(`NOTE: ${oneLine(r.degraded)}.`, "");
 
   if (r.independent.length === 0 && r.contradictions.length === 0) {

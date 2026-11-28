@@ -108,7 +108,7 @@ export async function computeDelta(rt: Runtime, shared: DeltaShard[], all: Delta
   const pairedTo = new Set<string>();
   const pairedFrom = new Set<string>();
 
-  // (a) supersede chains Continuity itself recorded (core/memory.ts supersede()). A chain
+  // (a) supersede chains Kontinuity itself recorded (core/memory.ts supersede()). A chain
   // A→B→C with several seen links pairs the FRESHEST seen link to C: that is the text this
   // runtime last knew, which is exactly what "old → new" must show.
   const chainFrom = new Map<string, { id: string; content: string; at?: string }>();

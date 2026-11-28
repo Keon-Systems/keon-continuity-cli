@@ -1,5 +1,5 @@
 /**
- * Keon MCP Gateway client (TASK-82): the hosted transport for Continuity.
+ * Keon MCP Gateway client (TASK-82): the hosted transport for Kontinuity.
  *
  * Where the legacy `src/cortex.ts` `CortexClient` speaks direct Cortex HTTP (the local dev
  * path only), this client speaks MCP to the Keon MCP Gateway — the single ingress and egress
@@ -17,7 +17,7 @@
  * from tool arguments, and never authority: grants and capabilities are always re-derived from the
  * enrollment. With no profile configured an API-key client fails closed locally, before the wire.
  *
- * The operation mapping — Continuity verb → keon.cortex.* MCP tool:
+ * The operation mapping — Kontinuity verb → keon.cortex.* MCP tool:
  *
  *   briefing   → keon.cortex.memory.recall.v1   (kind: briefing)
  *   recall     → keon.cortex.memory.recall.v1   (kind: recall)
@@ -59,7 +59,7 @@
  *
  * Provenance gap (known, documented in docs/gateway-continuity-discovery.md): the write contract
  * carries `source` / `subject_keys` labels but no provenance block (original event time, source
- * kind, session URN) and no client idempotency field. Continuity passes what the contract allows
+ * kind, session URN) and no client idempotency field. Kontinuity passes what the contract allows
  * and does not invent the rest.
  */
 
@@ -102,7 +102,7 @@ export function assertProfileId(value: unknown, where = "profile_id"): string {
  * Resolve the gateway connection from config + the machine's enrolled credential.
  *
  * Sources, in order:
- *   1. The endpoint: `gatewayUrl` in config.json, else the endpoint stored by `continuity gateway login`.
+ *   1. The endpoint: `gatewayUrl` in config.json, else the endpoint stored by `kontinuity gateway login`.
  *   2. The credential: KEON_MCP_BEARER_TOKEN / KEON_MCP_API_KEY (+ KEON_MCP_TENANT_ID +
  *      KEON_MCP_ACTOR_ID) from the environment, else the securely stored enrollment.
  *   3. The per-call profile: KEON_MCP_PROFILE_ID, else `gatewayProfileId`, else the stored profile.
@@ -125,7 +125,7 @@ export function loadGatewayConnection(cfg: ContinuityConfig, env: NodeJS.Process
     if (bearer || apiKey) {
       throw new GatewayError(
         "a gateway machine credential is set in the environment (KEON_MCP_BEARER_TOKEN / KEON_MCP_API_KEY) but no gateway endpoint is configured: " +
-          'set "gatewayUrl" in ~/.config/continuity/config.json or run `continuity gateway login`. Refusing to fall back to direct Cortex.',
+          'set "gatewayUrl" in ~/.config/continuity/config.json or run `kontinuity gateway login`. Refusing to fall back to direct Cortex.',
       );
     }
     return undefined;
@@ -154,7 +154,7 @@ export function loadGatewayConnection(cfg: ContinuityConfig, env: NodeJS.Process
       ...(profileId ? { profileId } : {}),
     };
   }
-  throw new GatewayError(`gateway endpoint ${endpoint} is configured but no machine credential is enrolled: run \`continuity gateway login\`, or set KEON_MCP_BEARER_TOKEN / KEON_MCP_API_KEY (with KEON_MCP_TENANT_ID and KEON_MCP_ACTOR_ID from your gateway enrollment)`);
+  throw new GatewayError(`gateway endpoint ${endpoint} is configured but no machine credential is enrolled: run \`kontinuity gateway login\`, or set KEON_MCP_BEARER_TOKEN / KEON_MCP_API_KEY (with KEON_MCP_TENANT_ID and KEON_MCP_ACTOR_ID from your gateway enrollment)`);
 }
 
 const NO_PROFILE_MESSAGE =
@@ -202,7 +202,7 @@ export class GatewayProfileError extends GatewayError {
 
 /**
  * A governed refusal from the Gateway (an error envelope or a JSON-RPC error carrying one), with
- * the machine-readable `code`. The message says what the code means for a Continuity user; the
+ * the machine-readable `code`. The message says what the code means for a Kontinuity user; the
  * Gateway's own wording rides along. Nothing was done unless a `GatewayCurationIncompleteError` says so.
  */
 export class GatewayRefusedError extends GatewayError {
@@ -366,7 +366,7 @@ export interface GatewayRecallResult {
 }
 
 /** keon.cortex.memory_write_result.v1 — the persisted shard receipt. `curation_promoted` is
- *  Continuity's own honesty flag (G-4): a gateway write is never the local path's promotion. */
+ *  Kontinuity's own honesty flag (G-4): a gateway write is never the local path's promotion. */
 export interface GatewayWriteResult {
   shard_id: string;
   decision_id: string;
@@ -515,7 +515,7 @@ export interface GatewayWriteInput {
 /**
  * Arguments that would set identity. The gateway binds identity from the machine credential and
  * enrollment (and refuses forged arguments server-side); a call that tries to set it here is
- * refused before anything is sent. Same rule as the `continuity mcp` server (M-1 in core/mcp.ts),
+ * refused before anything is sent. Same rule as the `kontinuity mcp` server (M-1 in core/mcp.ts),
  * with the gateway envelope spellings added.
  */
 export const IDENTITY_ARGUMENTS = [
@@ -1494,7 +1494,7 @@ export class GatewayClient {
   async close(_id?: string, _evidence?: string): Promise<never> {
     throw new GatewayUnsupportedError(
       "unsupported on the Keon MCP Gateway transport: close builds its closure text from the old record's content and [open-loop] tag, and this surface has no get-shard tool, so it would be a guess. " +
-        "Nothing was written. Use `continuity gateway supersede <shared-record-id> <the closed text> --user-confirmed` with the closure text spelled out.",
+        "Nothing was written. Use `kontinuity gateway supersede <shared-record-id> <the closed text> --user-confirmed` with the closure text spelled out.",
     );
   }
 

@@ -12,7 +12,7 @@
  * NON-DESTRUCTIVE (README: changing an ID does not migrate memory): IDs never move silently.
  * This module is the read-through alias layer — every legacy id keeps resolving to the same
  * live profile as its canonical name. New writes go to the new id only after the owner reviews
- * the migration preview (`continuity profiles migrate-preview`) and approves the physical move;
+ * the migration preview (`kontinuity profiles migrate-preview`) and approves the physical move;
  * until then `writesTo` keeps every write on the legacy id and nothing splits.
  */
 
@@ -68,7 +68,7 @@ export interface ProfileAlias {
   legacy: readonly string[];
   /**
    * Where identity, local state and writes point TODAY. New writes go to `canonical` only after
-   * the owner reviews `continuity profiles migrate-preview` and approves the physical migration
+   * the owner reviews `kontinuity profiles migrate-preview` and approves the physical migration
    * (docs/profile-naming.md §Migration) — never automatically, never silently.
    */
   writesTo: string;
@@ -76,6 +76,20 @@ export interface ProfileAlias {
 }
 
 export const PROFILE_ALIASES: readonly ProfileAlias[] = [
+  {
+    kind: "proj",
+    canonical: "proj_keon_systems_keon_kontinuity",
+    legacy: ["proj_m0r6an_continuity"],
+    writesTo: "proj_m0r6an_continuity",
+    note: "The renamed product remote uses the existing remote-derived memory scope. The explicitly pinned product profile is a separate history.",
+  },
+  {
+    kind: "proj",
+    canonical: "proj_keon_systems_keon_kontinuity_cli",
+    legacy: ["proj_keon_systems_keon_continuity_cli"],
+    writesTo: "proj_keon_systems_keon_continuity_cli",
+    note: "The renamed standalone CLI remote uses its existing memory scope until the physical migration is verified.",
+  },
   {
     kind: "actor",
     canonical: "actor_me",

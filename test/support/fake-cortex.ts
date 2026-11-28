@@ -1,5 +1,5 @@
 /**
- * A tiny in-process stand-in for the Cortex HTTP routes Continuity uses. It records every request so
+ * A tiny in-process stand-in for the Cortex HTTP routes Kontinuity uses. It records every request so
  * tests can assert exactly what was sent, and it can be told to misbehave (drop, refuse, 5xx) to
  * exercise the outbox. It is NOT a Cortex: idempotency here is "same X-Idempotency-Key → same shard".
  */
@@ -329,7 +329,7 @@ export class FakeCortex {
       // Like real Cortex, recall honours `limit` (continuity always asks for 8) and ranks the records that
       // match the query ahead of the rest. Handing back every record on the board made the fake answer a
       // recall with 100+ results, so the access event listing them was a 422 ("must be 1-100 distinct
-      // identifiers") and `continuity recall` failed once a board held about 100 records.
+      // identifiers") and `kontinuity recall` failed once a board held about 100 records.
       const q = typeof body?.query === "string" ? body.query : "";
       const terms = q.trim().split(/\s+/).filter(Boolean);
       const matches = (r: { content: string }) => terms.length > 0 && (r.content === q || r.content.startsWith(q) || (() => { const toks = r.content.split(/\s+/); return terms.every((t: string) => toks.some((k: string) => k.startsWith(t))); })());

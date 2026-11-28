@@ -1,5 +1,5 @@
 /**
- * Continuity runtime: one per agent session, in ANY agent harness (pi, Claude Code,
+ * Kontinuity runtime: one per agent session, in ANY agent harness (pi, Claude Code,
  * Codex, Gemini CLI, Grok Build, …). No pi imports here. Holds config, the two Cortex
  * identities (this runtime's agent role + the owner role), the resolved project
  * profile, and local state.

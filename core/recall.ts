@@ -3,7 +3,7 @@
  *
  * Rule: anything the briefing can tell you, recall can find. The briefing folds the
  * cross-project profiles — proj_me (life profile) and proj_north_star (north star) — into
- * every project, so every search surface (the CLI's `continuity recall`, GET /api/recall,
+ * every project, so every search surface (the CLI's `kontinuity recall`, GET /api/recall,
  * the Concierge/MCP recall tool) runs the SAME lexical query against the project profile
  * AND those two, and unions the hits so a [preference] is findable by its words.
  *
