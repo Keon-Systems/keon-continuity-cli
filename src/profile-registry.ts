@@ -77,6 +77,20 @@ export interface ProfileAlias {
 
 export const PROFILE_ALIASES: readonly ProfileAlias[] = [
   {
+    kind: "proj",
+    canonical: "proj_keon_systems_keon_kontinuity",
+    legacy: ["proj_m0r6an_continuity"],
+    writesTo: "proj_m0r6an_continuity",
+    note: "The renamed product remote uses the existing remote-derived memory scope. The explicitly pinned product profile is a separate history.",
+  },
+  {
+    kind: "proj",
+    canonical: "proj_keon_systems_keon_kontinuity_cli",
+    legacy: ["proj_keon_systems_keon_continuity_cli"],
+    writesTo: "proj_keon_systems_keon_continuity_cli",
+    note: "The renamed standalone CLI remote uses its existing memory scope until the physical migration is verified.",
+  },
+  {
     kind: "actor",
     canonical: "actor_me",
     legacy: ["proj_me"],
