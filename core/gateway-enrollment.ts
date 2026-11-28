@@ -1,7 +1,7 @@
 /**
  * Gateway sign-in / enrollment for this machine (TASK-196).
  *
- * `continuity gateway login` is the interactive enrollment step the hosted setup path needs:
+ * `kontinuity gateway login` is the interactive enrollment step the hosted setup path needs:
  *
  *   1. ask for the Gateway endpoint, the machine credential, and the identity/profile the
  *      enrollment carries (or take any of them from flags/environment),
@@ -9,7 +9,7 @@
  *      `tools/list`, then one `memory.search` to prove the per-call profile when an API key is
  *      used) — nothing is written to memory and no Runtime decide runs,
  *   3. store the secret in the user-only credential store (src/gateway-credentials.ts) and the
- *      non-secret endpoint/profile in config.json, so ordinary Continuity commands route through
+ *      non-secret endpoint/profile in config.json, so ordinary Kontinuity commands route through
  *      the Gateway from then on (core/runtime.ts).
  *
  * Contract gap this design respects (`docs/gateway-enrollment.md`): the Gateway contract has NO
@@ -249,7 +249,7 @@ export async function loginGateway(input: GatewayLoginInput = {}, deps: GatewayL
     if (profileId) {
       try {
         // A profile-scoped read: proves the enrollment's AllowedProfiles entry server-side.
-        await client.search("continuity gateway login check", { limit: 1, profileId });
+        await client.search("kontinuity gateway login check", { limit: 1, profileId });
       } catch (e) {
         if (e instanceof GatewayRefusedError && (e.code === "MCP_PROFILE_DENIED" || e.code === "MCP_KEY_REVOKED")) throw loginVerificationError(e);
         verificationNote = `the credential works, but the profile probe did not complete: ${e instanceof Error ? e.message : String(e)}`;

@@ -1,5 +1,5 @@
 /**
- * Hygiene — a READ-ONLY review queue over what Continuity keeps showing and what feedback
+ * Hygiene — a READ-ONLY review queue over what Kontinuity keeps showing and what feedback
  * keeps saying back:
  *
  *   stale        delivered often but never applied (access is not use)
@@ -263,7 +263,7 @@ export async function hygieneReport(rt: Runtime): Promise<HygieneReport> {
 export function formatHygiene(rep: HygieneReport): string {
   const short = (id: string) => id.slice(0, 10);
   const body = (e: HygieneEntry) => (e.text ? `[${e.tag}] ${e.text}` : "(content unavailable)");
-  const lines: string[] = [`## Continuity hygiene — ${rep.profile} (read-only · nothing written · ranking untouched)`];
+  const lines: string[] = [`## Kontinuity hygiene — ${rep.profile} (read-only · nothing written · ranking untouched)`];
   const sec = (title: string, rows: string[]) => {
     if (rows.length === 0) return;
     lines.push(``, title, ...rows);
@@ -294,6 +294,6 @@ export function formatHygiene(rep: HygieneReport): string {
   if (rep.loopsSkipped.truncated) skipped.push("the open-loop search hit its cap — the loop list may be incomplete");
   if (rep.loopsSkipped.undated > 0) skipped.push(`${rep.loopsSkipped.undated} open loop(s) have no date and cannot be aged`);
   if (skipped.length) lines.push(`(${skipped.join("; ")})`);
-  lines.push(`A review queue for the user, not a verdict: nothing here writes to Cortex, feedback changes no ranking, and no record is retired automatically. After review: \`continuity supersede <id> <text> --user-confirmed\`, \`continuity done <id>\`, or leave it.`);
+  lines.push(`A review queue for the user, not a verdict: nothing here writes to Cortex, feedback changes no ranking, and no record is retired automatically. After review: \`kontinuity supersede <id> <text> --user-confirmed\`, \`continuity done <id>\`, or leave it.`);
   return lines.join("\n");
 }

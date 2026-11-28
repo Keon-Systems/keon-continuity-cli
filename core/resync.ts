@@ -17,7 +17,7 @@
  *     expose successor ids (the lineage limit core/delta.ts documents), so an unknown
  *     successor is stamped `SUPERSEDED_UNKNOWN` — history that can never read as live.
  *   - Local-only review state is NOT in Cortex and is preserved: rows deliberately dropped
- *     from review (`continuity drop`, the `dropped` ledger) stay dropped — the private shard
+ *     from review (`kontinuity drop`, the `dropped` ledger) stay dropped — the private shard
  *     still exists in Cortex, and a resync must not resurrect what the user already handled.
  *     Promoted private sources (share/supersede write-trail) are identified by content —
  *     Cortex derives shard identity from content+scope, so a private shard whose content

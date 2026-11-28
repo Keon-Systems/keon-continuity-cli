@@ -76,5 +76,5 @@ export async function runHandoffDemo(): Promise<DemoResult> {
 }
 
 export function renderHandoffDemo(result: DemoResult): string {
-  return ["Continuity handoff demo (synthetic; no credentials or network)", ...result.steps.map((step, i) => `${i + 1}. ${step.outcome}`), `Decision: ${result.decision}`].join("\n");
+  return ["Kontinuity handoff demo (synthetic; no credentials or network)", ...result.steps.map((step, i) => `${i + 1}. ${step.outcome}`), `Decision: ${result.decision}`].join("\n");
 }

@@ -1,6 +1,6 @@
 # Hosted handoff release gate for v0.2.0
 
-The CLI fixes and credential-free demo are merged. The hosted handoff is blocked on the Gateway owner. Keep the tag and release unpublished until this check passes. [CLI changes](https://github.com/Keon-Systems/keon-continuity-cli/pull/2)
+The CLI fixes and credential-free demo are merged. The hosted handoff is blocked on the Gateway owner. Keep the tag and release unpublished until this check passes. [CLI changes](https://github.com/Keon-Systems/keon-kontinuity-cli/pull/2)
 
 ## Unblock in this order
 
@@ -20,4 +20,4 @@ Use the tested v0.2.0 package and separate clean CLI contexts for the writer and
 4. Start a fresh reader session. Confirm that its briefing or recall retrieves the same decision as shared memory.
 5. Record the verified project, distinct roles, source and shared record references, and the pass result. Publish the verified package after the owner records that evidence.
 
-The local synthetic demo and the platform matrix verify the release artifact independently of the hosted handoff. [Package verification run](https://github.com/Keon-Systems/keon-continuity-cli/actions/runs/45049637654)
+The local synthetic demo and the platform matrix verify the release artifact independently of the hosted handoff. [Package verification run](https://github.com/Keon-Systems/keon-kontinuity-cli/actions/runs/45049637654)

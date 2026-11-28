@@ -66,7 +66,7 @@ function isVocabularyRecord(content: string, tag: "schema" | "retired-schema"): 
 /** Field names that read as authority. Memory is contextual data, never a capability (charter §3). */
 const FORBIDDEN_FIELD_NAMES = new Set(["grant", "grants", "cap", "capability", "permission", "permissions", "allow", "deny", "exec", "execute", "run", "command", "instruction", "instructions", "role", "scope", "tenant", "secret", "token", "key"]);
 
-/** Reserved by Continuity itself ("none" is the pii: sentinel — a field named "none" would make `pii: none` ambiguous). */
+/** Reserved by Kontinuity itself ("none" is the pii: sentinel — a field named "none" would make `pii: none` ambiguous). */
 const RESERVED_FIELD_NAMES = new Set(["text", "id", "schema", "tag", "none"]);
 
 // ---------- parsing ----------
@@ -79,7 +79,7 @@ export function parseFieldSpec(spec: string): SchemaField[] {
     const name = m[1];
     if (out.some((field) => field.name === name)) throw new Error(`duplicate field "${name}"`);
     if (FORBIDDEN_FIELD_NAMES.has(name)) throw new Error(`field "${name}" is refused: a schema can never grant authority or name scopes/secrets (Cortex charter §3)`);
-    if (RESERVED_FIELD_NAMES.has(name)) throw new Error(`field "${name}" is reserved by Continuity`);
+    if (RESERVED_FIELD_NAMES.has(name)) throw new Error(`field "${name}" is reserved by Kontinuity`);
     const type: FieldType = m[3] ? { enum: m[3].split("|").map((s) => s.trim()).filter(Boolean) } : (m[2] as Exclude<FieldType, { enum: string[] }>);
     if (typeof type === "object" && type.enum.length === 0) throw new Error(`bad field "${raw}" — enum(...) needs at least one value`);
     out.push({ name, type, optional: Boolean(m[4]) });

@@ -3,7 +3,7 @@
  * (<!-- continuity:begin --> … <!-- continuity:end -->) that AGENTS.md, CLAUDE.md, GEMINI.md and
  * .cursorrules readers get for free — no skill, no hook, no extension.
  *
- * `continuity render` creates or refreshes the block; every `share` and `supersede` keeps it
+ * `kontinuity render` creates or refreshes the block; every `share` and `supersede` keeps it
  * current — from the command's directory up to the repository root, but only in files that
  * already carry a block. Nothing is ever written into a file
  * that did not ask, and everything outside the markers belongs to the user: it is preserved

@@ -2,7 +2,7 @@
  * Vendor chat-export parsing for the web-chat bridge.
  *
  * A web chat (claude.ai / ChatGPT / Gemini) cannot run the CLI and cannot reach Cortex, so the
- * round trip is: `continuity briefing --clipboard` into the web chat, converse, then export the
+ * round trip is: `kontinuity briefing --clipboard` into the web chat, converse, then export the
  * vendor's data and import it here. Each message becomes one `[imported]` item whose own timestamp
  * is the event time (→ provenance.checkpointAt), so history keeps its dates. Nothing is shared:
  * imports land private + pending for user review, exactly like `stage`.

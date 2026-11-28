@@ -226,12 +226,12 @@ function exitClean(code: number): never {
 }
 const die = (msg: string, code = 1): never => {
   if (activeExit) throw activeExit; // re-entrant die (e.g. a catch re-die'd the unwind): keep the original exit
-  process.stderr.write(`continuity: ${msg}\n`);
+  process.stderr.write(`kontinuity: ${msg}\n`);
   return exitClean(code);
 };
 /** Deprecated-name shim (TASK-78): hidden from help, warns on stderr — stdout stays clean for pipes and --json. */
 const noteDeprecated = (oldName: string, newName: string): void => {
-  process.stderr.write(`continuity: "${oldName}" is deprecated — use "${newName}" (the old name keeps working for one release; removal targeted at v0.2.0)\n`);
+  process.stderr.write(`kontinuity: "${oldName}" is deprecated — use "${newName}" (the old name keeps working for one release; removal targeted at v0.2.0)\n`);
 };
 const errText = (e: unknown) => (e instanceof CortexError ? `Cortex ${e.status}: ${(typeof e.detail === "string" ? e.detail : JSON.stringify(e.detail)).slice(0, 200)}` : e instanceof Error ? e.message : String(e));
 
@@ -284,7 +284,7 @@ async function cmdBriefing(rt: Runtime, a: Args, sessionId: string) {
     return emitBriefing(a, p.text, { profile: rt.profileId, asOf: p.asOf, label: p.label, text: p.text, included: p.includedIds, history: p.historyIds, unplaced: p.unplacedIds, future: p.futureIds, shared: p.sharedCount, private: p.privateCount, approxTokens: p.approxTokens, tokenBudget: p.tokenBudget, tokenEstimator: p.tokenEstimator, omittedForBudget: p.omittedForBudget });
   }
   const p = await buildBriefing(rt, sessionId, { showIds: a.ids });
-  const text = p ? p.text : `${briefingTitle(rt.projectLabel)}\n(no memories yet for this project — use \`continuity remember\` / \`continuity stage\`)`;
+  const text = p ? p.text : `${briefingTitle(rt.projectLabel)}\n(no memories yet for this project — use \`kontinuity remember\` / \`kontinuity stage\`)`;
   const json = p
     ? { profile: rt.profileId, text: p.text, delta: p.delta, branchWarnings: p.branchWarnings, included: p.includedIds, omitted: p.omittedIds, shared: p.sharedCount, private: p.privateCount, resurface: p.resurface, recallEventId: p.recallEventId, approxTokens: p.approxTokens, tokenBudget: p.tokenBudget, tokenEstimator: p.tokenEstimator, omittedForBudget: p.omittedForBudget }
     : { empty: true, profile: rt.profileId, text };
@@ -325,7 +325,7 @@ function ribbon(d: ShardDetail | undefined, verified: boolean, home?: string): s
 
 async function cmdRecall(rt: Runtime, a: Args, sessionId: string) {
   const query = a.rest.join(" ").trim();
-  if (!query) die("usage: continuity recall <query>");
+  if (!query) die("usage: kontinuity recall <query>");
   assertQueryBounds(query);
   // Cross-profile recall (TASK-43): one lexical query, every profile the briefing reads —
   // the project profile plus proj_me (life profile) and proj_north_star (north star).
@@ -379,7 +379,7 @@ async function cmdRecall(rt: Runtime, a: Args, sessionId: string) {
  */
 async function cmdCheck(rt: Runtime, a: Args, sessionId: string) {
   const hookMode = !a.path && !a.command;
-  if (hookMode && process.stdin.isTTY) return die("usage: continuity check [--path <path>] [--cmd <command>] (no flags: reads a tool-hook JSON payload on stdin)", 2);
+  if (hookMode && process.stdin.isTTY) return die("usage: kontinuity check [--path <path>] [--cmd <command>] (no flags: reads a tool-hook JSON payload on stdin)", 2);
   let what = "this tool call";
   let subject = "";
   if (hookMode) {
@@ -400,7 +400,7 @@ async function cmdCheck(rt: Runtime, a: Args, sessionId: string) {
       parts.push(a.command.trim());
       what = parts.length > 1 ? "this path/command" : "this command";
     }
-    if (parts.length === 0) return die("usage: continuity check [--path <path>] [--cmd <command>]", 2);
+    if (parts.length === 0) return die("usage: kontinuity check [--path <path>] [--cmd <command>]", 2);
     subject = parts.join("\n");
   }
   if (!subject) return;
@@ -417,7 +417,7 @@ async function cmdCheck(rt: Runtime, a: Args, sessionId: string) {
     // No permissionDecision anywhere: a warn-only hook adds context and stops nothing.
     return process.stdout.write(`${JSON.stringify({ systemMessage: note, hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: note } })}\n`);
   }
-  return out(a, report.notes.length ? report.notes.join("\n") : "continuity check: no [decision] or [rejected] record overlaps this — nothing to warn about.", report);
+  return out(a, report.notes.length ? report.notes.join("\n") : "kontinuity check: no [decision] or [rejected] record overlaps this — nothing to warn about.", report);
 }
 
 /**
@@ -444,7 +444,7 @@ async function cmdJit(rt: Runtime, a: Args, sessionId: string) {
     if (typeof parsed.session_id === "string" && parsed.session_id.trim()) session = parsed.session_id.trim();
   } else if (!prompt) {
     prompt = readFileSync(0, "utf8").trim();
-    if (!prompt) return die(`usage: continuity jit <prompt-text…>  (or pipe the prompt on stdin, or pass --from-json for hook input)`, 2);
+    if (!prompt) return die(`usage: kontinuity jit <prompt-text…>  (or pipe the prompt on stdin, or pass --from-json for hook input)`, 2);
   }
   // --once: deliver for the first prompt of a session only. Checked before the recall;
   // recorded only after it, so a failed attempt is retried on the next prompt.
@@ -472,7 +472,7 @@ async function cmdJit(rt: Runtime, a: Args, sessionId: string) {
 
 async function cmdRemember(rt: Runtime, a: Args, sessionId: string) {
   const text = a.rest.join(" ").trim();
-  if (!text) die("usage: continuity remember <text> --user-confirmed");
+  if (!text) die("usage: kontinuity remember <text> --user-confirmed");
   requireConfirmed(a, "remember");
   const content = tagged(text);
   // Pre-write contradiction check: warn-only, but never silent (core/memory.ts).
@@ -496,7 +496,7 @@ async function cmdRemember(rt: Runtime, a: Args, sessionId: string) {
  */
 async function cmdMilestone(rt: Runtime, a: Args, sessionId: string) {
   const text = a.rest.join(" ").trim();
-  if (!text) die("usage: continuity milestone <text…> --user-confirmed");
+  if (!text) die("usage: kontinuity milestone <text…> --user-confirmed");
   requireConfirmed(a, "milestone");
   // Pre-write contradiction check: warn-only, but never silent (core/memory.ts).
   const check = await preWriteCheck(rt, milestoneContent(text));
@@ -537,8 +537,8 @@ async function stageItems(rt: Runtime, a: Args, sessionId: string, items: { cont
     `${label}: ${saved} of ${results.length} saved as PRIVATE to ${rt.runtimeName} (pending user review). Nothing is shared yet.${notSaved ? ` ${notSaved} NOT saved — see below. Do not tell the user those were remembered.` : ""}`,
     ...results.map((r) => [writeLine(r.outcome, r.content, r.unsure ? "(unsure) " : ""), ...formatPreWrite(r.check).map((l) => `      ${l}`)].join("\n")),
     ``,
-    notSaved ? `Unsaved items are kept safely in the outbox and retried automatically; check with \`continuity outbox\`, deliver now with \`continuity outbox flush\`.` : `Next: show this list to the user, ask which to share with every agent, then run`,
-    ...(notSaved ? [] : [`  continuity share <id…> --user-confirmed     and/or     continuity drop <id…>`]),
+    notSaved ? `Unsaved items are kept safely in the outbox and retried automatically; check with \`kontinuity outbox\`, deliver now with \`kontinuity outbox flush\`.` : `Next: show this list to the user, ask which to share with every agent, then run`,
+    ...(notSaved ? [] : [`  kontinuity share <id…> --user-confirmed     and/or     continuity drop <id…>`]),
   ].join("\n");
   const itemsJson = results.map((r) => ({ content: r.content, unsure: r.unsure, contradictionCheck: r.check, ...r.outcome }));
   out(a, human, { saved, notSaved, items: itemsJson, staged: itemsJson.filter((x) => x.status === "saved") });
@@ -549,7 +549,7 @@ async function cmdStage(rt: Runtime, a: Args, sessionId: string) {
   assertCaptureAllowed(rt.cfg.tenantId);
   const raw = a.file ? readFileSync(a.file, "utf8") : readFileSync(0, "utf8");
   const items = parseItems(raw);
-  if (items.length === 0) die("no items parsed. Expected the JSON object described by `continuity prompt` on stdin (or --file).", 2);
+  if (items.length === 0) die("no items parsed. Expected the JSON object described by `kontinuity prompt` on stdin (or --file).", 2);
   await stageItems(
     rt,
     a,
@@ -580,7 +580,7 @@ async function cmdCapture(rt: Runtime, a: Args, sessionId: string) {
     where = path;
     label = path.split("/").pop() ?? path;
   } else {
-    if (process.stdin.isTTY) die("usage: continuity capture [<transcript.jsonl>] — with no path, the Claude Code hook JSON (or the transcript itself) comes on stdin", 2);
+    if (process.stdin.isTTY) die("usage: kontinuity capture [<transcript.jsonl>] — with no path, the Claude Code hook JSON (or the transcript itself) comes on stdin", 2);
     raw = readFileSync(0, "utf8");
     const hook = parseHookInput(raw);
     if (hook) {
@@ -621,7 +621,7 @@ async function cmdCapture(rt: Runtime, a: Args, sessionId: string) {
     a,
     [
       `capture (${where}): ${saved} of ${results.length} staged as PRIVATE (pending user review). Nothing is shared.`,
-      ...(notSaved ? [` ${notSaved} NOT saved — kept in the outbox and retried automatically (\`continuity outbox\`).`, ...unsaved.map((r) => writeLine(r.outcome, r.content))] : []),
+      ...(notSaved ? [` ${notSaved} NOT saved — kept in the outbox and retried automatically (\`kontinuity outbox\`).`, ...unsaved.map((r) => writeLine(r.outcome, r.content))] : []),
     ].join("\n"),
     { saved, notSaved, items: results.map((r) => ({ content: r.content, ...r.outcome })) },
   );
@@ -629,7 +629,7 @@ async function cmdCapture(rt: Runtime, a: Args, sessionId: string) {
 }
 
 async function cmdShare(rt: Runtime, a: Args, sessionId: string) {
-  if (a.rest.length === 0) die("usage: continuity share <id…> --user-confirmed");
+  if (a.rest.length === 0) die("usage: kontinuity share <id…> --user-confirmed");
   requireConfirmed(a, "share");
   const ids = resolveIds(rt, a.rest, "pending");
   const results: { sourceId: string; derivedId: string; content: string; check: PreWriteReport }[] = [];
@@ -650,7 +650,7 @@ async function cmdShare(rt: Runtime, a: Args, sessionId: string) {
 }
 
 function cmdDrop(rt: Runtime, a: Args, sessionId: string) {
-  if (a.rest.length === 0) die("usage: continuity drop <id…>");
+  if (a.rest.length === 0) die("usage: kontinuity drop <id…>");
   const ids = resolveIds(rt, a.rest, "pending");
   rt.state.pending = rt.state.pending.filter((p) => !ids.includes(p.shardId));
   // A drop is local review state — the shard stays private in Cortex — so record what was
@@ -664,7 +664,7 @@ function cmdDrop(rt: Runtime, a: Args, sessionId: string) {
 async function cmdSupersede(rt: Runtime, a: Args, sessionId: string) {
   const [pfx, ...textParts] = a.rest;
   const text = textParts.join(" ").trim();
-  if (!pfx || !text) die("usage: continuity supersede <shared-id> <new text> --user-confirmed");
+  if (!pfx || !text) die("usage: kontinuity supersede <shared-id> <new text> --user-confirmed");
   requireConfirmed(a, "supersede");
   const [oldId] = resolveIds(rt, [pfx], "shared");
   const content = tagged(text);
@@ -683,12 +683,12 @@ async function cmdSupersede(rt: Runtime, a: Args, sessionId: string) {
 async function cmdClose(rt: Runtime, a: Args, sessionId: string) {
   const [pfx] = a.rest;
   const evidence = (a.evidence ?? "").trim();
-  if (!pfx || !evidence) die("usage: continuity close <shared-id> --evidence <ref> [--user-confirmed]", 2);
+  if (!pfx || !evidence) die("usage: kontinuity close <shared-id> --evidence <ref> [--user-confirmed]", 2);
   if (/\s/.test(evidence)) die("--evidence must be a single ref (PR URL, commit sha, run id — no spaces)", 2);
   const [oldId] = resolveIds(rt, [pfx], "shared");
   const loop = rt.state.shared.find((s) => s.derivedId === oldId)!;
   const tag = tagOf(loop.content);
-  if (tag !== "open-loop") die(`close is for [open-loop] records; ${short(oldId)} is [${tag}]. To change it, use \`continuity supersede\`.`, 2);
+  if (tag !== "open-loop") die(`close is for [open-loop] records; ${short(oldId)} is [${tag}]. To change it, use \`kontinuity supersede\`.`, 2);
   const content = closureContent(loop.content, evidence);
   if (!a.userConfirmed) {
     // Proposal only: the agent observed evidence; nothing shared changes until the user confirms.
@@ -707,7 +707,7 @@ async function cmdClose(rt: Runtime, a: Args, sessionId: string) {
       a,
       [
         writeLine(o, content, `closure proposed for ${short(oldId)} · `),
-        saved ? `Nothing is superseded yet: a [closed] candidate is staged PRIVATE to ${rt.runtimeName}, pending the user's review.` : `The candidate is NOT saved — do not tell the user it was; \`continuity outbox\` retries it.`,
+        saved ? `Nothing is superseded yet: a [closed] candidate is staged PRIVATE to ${rt.runtimeName}, pending the user's review.` : `The candidate is NOT saved — do not tell the user it was; \`kontinuity outbox\` retries it.`,
         `After the user confirms:  continuity close ${short(oldId)} --evidence ${evidence} --user-confirmed`,
       ].join("\n"),
       { oldId, evidence, content, outcome: o, proposed: true },
@@ -727,7 +727,7 @@ async function cmdClose(rt: Runtime, a: Args, sessionId: string) {
 async function cmdHandoff(rt: Runtime, a: Args, sessionId: string) {
   const to = (a.to ?? "").trim();
   const text = a.rest.join(" ").trim();
-  if (!to || !text) die("usage: continuity handoff --to <runtime> <text…>", 2);
+  if (!to || !text) die("usage: kontinuity handoff --to <runtime> <text…>", 2);
   const toRuntime = normalizeRuntimeName(to);
   if (toRuntime === rt.runtimeName) die(`"${toRuntime}" is this runtime — a baton is for another agent. Pass --to <other runtime>.`, 2);
   const toRole = roleForRuntimeName(rt.cfg, toRuntime);
@@ -782,7 +782,7 @@ function cmdReview(rt: Runtime, a: Args) {
   lines.push(``, `Confirmed records (visible to every agent on this project):`);
   if (s.length) for (const x of s) lines.push(`  ${short(x.derivedId)}  ${x.approvedAt.slice(0, 10)}  ${oneLine(x.content, 160)}`);
   else lines.push(`  (none yet)`);
-  lines.push(``, `Second opinion on what to confirm: \`continuity review --compare --user-confirmed\` (owner view).`);
+  lines.push(``, `Second opinion on what to confirm: \`kontinuity review --compare --user-confirmed\` (owner view).`);
   out(a, lines.join("\n"), { pending: p, shared: s });
 }
 
@@ -798,7 +798,7 @@ async function cmdReviewCompare(rt: Runtime, a: Args, sessionId: string) {
 async function cmdImport(rt: Runtime, a: Args, sessionId: string) {
   const pathArg = a.rest.join(" ").trim();
   if (a.from === VENDOR_MEMORY) return cmdImportVendorMemory(rt, a, sessionId, pathArg);
-  if (!pathArg) die("usage: continuity import <path> [--from chatgpt-export|claude-export|vendor-memory]");
+  if (!pathArg) die("usage: kontinuity import <path> [--from chatgpt-export|claude-export|vendor-memory]");
   const path = resolve(process.cwd(), pathArg.replace(/^~\//, `${process.env.HOME}/`));
   if (!existsSync(path)) die(`not found: ${path}`);
   const raw = readFileSync(path, "utf8");
@@ -865,7 +865,7 @@ async function cmdImportVendorMemory(rt: Runtime, a: Args, sessionId: string, pa
     ...results.map((r) => writeLine(r.outcome, r.content)),
     ``,
     notSaved
-      ? `Unsaved candidates are kept safely in the outbox and retried automatically; check with \`continuity outbox\`, deliver now with \`continuity outbox flush\`.`
+      ? `Unsaved candidates are kept safely in the outbox and retried automatically; check with \`kontinuity outbox\`, deliver now with \`kontinuity outbox flush\`.`
       : `Next: show these candidates to the user, then\n  continuity prefs accept <id…> --user-confirmed     (→ confirmed [preference], every project)     and/or     continuity prefs reject <id…>`,
   ].join("\n");
   out(a, human, { saved, notSaved, items: results.map((r) => ({ content: r.content, ...r.outcome })) });
@@ -893,7 +893,7 @@ function chunkDocument(raw: string): string[] {
 
 async function cmdEvidence(rt: Runtime, a: Args) {
   const [pfx] = a.rest;
-  if (!pfx) die("usage: continuity evidence <shared-id>");
+  if (!pfx) die("usage: kontinuity evidence <shared-id>");
   const [id] = resolveIds(rt, [pfx], "shared");
   const ev = await rt.owner.evidence(id);
   const ver = await rt.owner.verifyEvidence({ shardId: id });
@@ -906,14 +906,14 @@ async function cmdEvidence(rt: Runtime, a: Args) {
 
 async function cmdBlame(rt: Runtime, a: Args) {
   const path = a.rest.join(" ").trim();
-  if (!path) die("usage: continuity blame <path>");
+  if (!path) die("usage: kontinuity blame <path>");
   const report = await blameFile(rt, path);
   out(a, formatBlame(report), report);
 }
 
 function formatBlame(r: BlameReport): string {
   if (r.commits.length === 0) {
-    return `no Continuity-Applied trailers on commits touching ${r.path} — records shape commits through \`feedback applied\` + the prepare-commit-msg hook (\`continuity git install-hooks\`)`;
+    return `no Continuity-Applied trailers on commits touching ${r.path} — records shape commits through \`feedback applied\` + the prepare-commit-msg hook (\`kontinuity git install-hooks\`)`;
   }
   const recordCount = r.commits.reduce((n, c) => n + c.records.length, 0);
   const lines = [`${r.path} — ${recordCount} recorded item(s) across ${r.commits.length} commit(s) that carried them (newest first)`];
@@ -944,7 +944,7 @@ async function cmdLater(rt: Runtime, a: Args, sessionId: string) {
   const [spec, ...textParts] = a.rest;
   const text = textParts.join(" ").trim();
   const revisit = spec ? resolveDate(spec) : undefined;
-  if (!revisit || !text) return die("usage: continuity later <YYYY-MM-DD | +90d | +6m | +1y> <text…> --user-confirmed");
+  if (!revisit || !text) return die("usage: kontinuity later <YYYY-MM-DD | +90d | +6m | +1y> <text…> --user-confirmed");
   requireConfirmed(a, "later");
   const r = await addLater(rt, revisit, text, sessionId, rt.runtimeName);
   out(a, `deferred to ${revisit} · ${short(r.derivedId)}\n${r.content}`, r);
@@ -968,7 +968,7 @@ async function cmdSnooze(rt: Runtime, a: Args, sessionId: string) {
   const [pfx, spec, ...textParts] = a.rest;
   const to = spec ? resolveDate(spec) : undefined;
   const text = textParts.join(" ").trim() || undefined;
-  if (!pfx || !to) return die("usage: continuity snooze <id> <YYYY-MM-DD | +Nd|+Nw|+Nm|+Ny> [replacement text…]");
+  if (!pfx || !to) return die("usage: kontinuity snooze <id> <YYYY-MM-DD | +Nd|+Nw|+Nm|+Ny> [replacement text…]");
   if (text) requireConfirmed(a, "snooze with new text");
   const item = await laterById(rt, sessionId, pfx);
   const id = await rescheduleLater(rt, item, sessionId, { snoozeTo: to, text }, rt.runtimeName);
@@ -977,7 +977,7 @@ async function cmdSnooze(rt: Runtime, a: Args, sessionId: string) {
 
 async function cmdDone(rt: Runtime, a: Args, sessionId: string) {
   const [pfx] = a.rest;
-  if (!pfx) die("usage: continuity done <id>");
+  if (!pfx) die("usage: kontinuity done <id>");
   const item = await laterById(rt, sessionId, pfx);
   const id = await rescheduleLater(rt, item, sessionId, { done: true }, rt.runtimeName);
   out(a, `done · ${short(id)}\n${item.text}`, { oldId: item.id, derivedId: id });
@@ -987,7 +987,7 @@ async function cmdDone(rt: Runtime, a: Args, sessionId: string) {
 
 async function cmdPrefer(rt: Runtime, a: Args, sessionId: string) {
   const text = a.rest.join(" ").trim();
-  if (!text) return die("usage: continuity prefer <text…> --user-confirmed");
+  if (!text) return die("usage: kontinuity prefer <text…> --user-confirmed");
   requireConfirmed(a, "prefer");
   const r = await addPreference(rt, text, sessionId, rt.runtimeName);
   out(a, `preference saved to the life profile · ${short(r.derivedId)}\n${r.content}`, r);
@@ -997,7 +997,7 @@ async function cmdPrefs(rt: Runtime, a: Args, sessionId: string) {
   const [sub = "list", ...rest] = a.rest;
   if (sub === "retire") {
     const [pfx] = rest;
-    if (!pfx) return die("usage: continuity prefs retire <id> --user-confirmed");
+    if (!pfx) return die("usage: kontinuity prefs retire <id> --user-confirmed");
     requireConfirmed(a, "prefs retire");
     const prefs = await listPreferences(rt, sessionId);
     const hits = (prefs?.items ?? []).filter((i) => i.id.startsWith(pfx));
@@ -1016,7 +1016,7 @@ async function cmdPrefs(rt: Runtime, a: Args, sessionId: string) {
     );
   }
   if (sub === "accept") {
-    if (rest.length === 0) return die("usage: continuity prefs accept <id…> --user-confirmed");
+    if (rest.length === 0) return die("usage: kontinuity prefs accept <id…> --user-confirmed");
     requireConfirmed(a, "prefs accept");
     const results: { candidateId: string; sourceId: string; derivedId: string; content: string }[] = [];
     for (const pfx of rest) {
@@ -1027,7 +1027,7 @@ async function cmdPrefs(rt: Runtime, a: Args, sessionId: string) {
     return out(a, results.map((r) => `accepted ${short(r.candidateId)} → confirmed preference, shared ${short(r.derivedId)}\n${r.content}`).join("\n"), { accepted: results });
   }
   if (sub === "reject") {
-    if (rest.length === 0) return die("usage: continuity prefs reject <id…>");
+    if (rest.length === 0) return die("usage: kontinuity prefs reject <id…>");
     const rejected: PreferenceCandidate[] = [];
     for (const pfx of rest) {
       const c = preferenceCandidateById(rt, pfx);
@@ -1036,7 +1036,7 @@ async function cmdPrefs(rt: Runtime, a: Args, sessionId: string) {
     }
     return out(a, rejected.map((c) => `rejected ${short(c.id)} — out of the review queue; the imported shard stays private`).join("\n"), { rejected });
   }
-  if (sub !== "list") return die("usage: continuity prefs [list | candidates | accept <id…> --user-confirmed | reject <id…> | retire <id> --user-confirmed]", 2);
+  if (sub !== "list") return die("usage: kontinuity prefs [list | candidates | accept <id…> --user-confirmed | reject <id…> | retire <id> --user-confirmed]", 2);
   const prefs = await listPreferences(rt, sessionId);
   const items = prefs?.items ?? [];
   out(a, items.length ? formatPreferences(items) : "no confirmed preferences yet — continuity prefer <text…> --user-confirmed", { items });
@@ -1064,20 +1064,20 @@ async function cmdSchema(rt: Runtime, a: Args, sessionId: string) {
     }
     case "propose": {
       const [name] = rest;
-      if (!name || !a.fields || !a.pii || !a.desc) return die('usage: continuity schema propose <name> --fields "revisit:date priority:enum(low|high)?" --pii none|field,… --desc "what this shape is" [--scope project|northstar]');
+      if (!name || !a.fields || !a.pii || !a.desc) return die('usage: kontinuity schema propose <name> --fields "revisit:date priority:enum(low|high)?" --pii none|field,… --desc "what this shape is" [--scope project|northstar]');
       const r = await proposeSchema(rt, sessionId, { name, description: a.desc, fields: a.fields, pii: a.pii, scope: a.scope });
       return out(a, [`proposed ${r.schema.key} (private to ${rt.runtimeName}; usable by this runtime now)`, r.schema.content, ``, `To make it shared vocabulary, after the user agrees: continuity schema approve ${r.schema.key} --user-confirmed`].join("\n"), r);
     }
     case "approve": {
       const [key] = rest;
-      if (!key) return die("usage: continuity schema approve <name/version> --user-confirmed");
+      if (!key) return die("usage: kontinuity schema approve <name/version> --user-confirmed");
       requireConfirmed(a, "schema approve");
       const sch = await approveSchema(rt, sessionId, key);
       return out(a, `approved ${sch.key} — shared vocabulary for every runtime\n${sch.content}`, sch);
     }
     case "retire": {
       const [key, ...why] = rest;
-      if (!key) return die("usage: continuity schema retire <name/version> [reason…] --user-confirmed");
+      if (!key) return die("usage: kontinuity schema retire <name/version> [reason…] --user-confirmed");
       requireConfirmed(a, "schema retire");
       const id = await retireSchema(rt, sessionId, key, why.join(" "));
       return out(a, `retired ${key} · ${short(id)} (history kept)`, { key, id });
@@ -1089,7 +1089,7 @@ async function cmdSchema(rt: Runtime, a: Args, sessionId: string) {
 
 async function cmdAdd(rt: Runtime, a: Args, sessionId: string) {
   const [shape, ...tokens] = a.rest;
-  if (!shape || tokens.length === 0) return die("usage: continuity add <shape> [k:v …] <text…> [--share --user-confirmed]");
+  if (!shape || tokens.length === 0) return die("usage: kontinuity add <shape> [k:v …] <text…> [--share --user-confirmed]");
   const schema = await findSchema(rt, sessionId, shape);
   if (!schema) return die(`no shape "${shape}". See: continuity schema list — or propose it: continuity schema propose ${shape} --fields … --pii … --desc …`, 2);
   if (schema.state === "private" && schema.ownedBy !== rt.agent.identity.roleId) return die(`"${schema.key}" is a private proposal of ${schema.ownedBy}; it isn't usable from ${rt.runtimeName} until approved`, 3);
@@ -1110,7 +1110,7 @@ async function cmdAdd(rt: Runtime, a: Args, sessionId: string) {
 
 function cmdPause(rt: Runtime, a: Args) {
   setCapturePaused(rt.cfg.tenantId, true, rt.runtimeName, a.rest.join(" ") || undefined);
-  out(a, `automatic capture is PAUSED for tenant ${rt.cfg.tenantId}. Nothing new is saved by autosave, stage or import until \`continuity resume\`. Explicit confirmed commands and reads still work.`, { paused: true });
+  out(a, `automatic capture is PAUSED for tenant ${rt.cfg.tenantId}. Nothing new is saved by autosave, stage or import until \`kontinuity resume\`. Explicit confirmed commands and reads still work.`, { paused: true });
 }
 
 function cmdResume(rt: Runtime, a: Args) {
@@ -1124,7 +1124,7 @@ async function cmdOutbox(rt: Runtime, a: Args) {
     const r = await flushOutbox(rt, {});
     // TASK-259: a flush that saved 0 while other runtimes' entries wait is never a bare "0" line —
     // it names each runtime, its profile and the exact command that runtime must run. Entry content
-    // stays out of this output; `continuity outbox` is where the queue is shown.
+    // stays out of this output; `kontinuity outbox` is where the queue is shown.
     const split = unsavedSplit(rt.cfg.tenantId, rt.runtimeName);
     const othersLine = split.others.length > 0 ? `${otherOutboxPhrases(split.others).join("; ")} (one runtime never flushes another runtime's entries)` : "";
     const tail = `${r.stillQueued} still queued · ${r.indeterminate} unconfirmed · ${r.quarantined} refused${r.skipped ? ` · ${r.skipped}` : ""}`;
@@ -1139,17 +1139,17 @@ async function cmdOutbox(rt: Runtime, a: Args) {
     return;
   }
   if (sub === "retry") {
-    if (!id) die("usage: continuity outbox retry <entry-id>", 2);
+    if (!id) die("usage: kontinuity outbox retry <entry-id>", 2);
     const e = requeue(rt.cfg.tenantId, id);
     return out(a, `entry ${e.id.slice(0, 12)} is queued again (attempts reset)`, e);
   }
   if (sub === "drop") {
-    if (!id) die("usage: continuity outbox drop <entry-id>", 2);
+    if (!id) die("usage: kontinuity outbox drop <entry-id>", 2);
     requireConfirmed(a, "discard a refused outbox entry");
     const e = dropQuarantined(rt.cfg.tenantId, id);
     return out(a, `discarded refused entry ${e.id.slice(0, 12)} (its content is gone; nothing was saved)`, { dropped: e.id });
   }
-  if (sub !== undefined) die("usage: continuity outbox [flush | retry <id> | drop <id> --user-confirmed]", 2);
+  if (sub !== undefined) die("usage: kontinuity outbox [flush | retry <id> | drop <id> --user-confirmed]", 2);
   const entries = listOutbox(rt.cfg.tenantId);
   const sum = outboxSummary(rt.cfg.tenantId);
   out(
@@ -1175,7 +1175,7 @@ const gitEvidence = async (memoryId: string) => {
 
 async function cmdFeedback(rt: Runtime, a: Args, sessionId: string) {
   const [kind, id, ...rest] = a.rest;
-  const usage = "usage: continuity feedback applied <id> <target_ref> | not-applicable <id> <context_ref> <reason…> | outcome <id> <target_ref> <success|failure|unknown|not_executed> [--evidence <ref>]";
+  const usage = "usage: kontinuity feedback applied <id> <target_ref> | not-applicable <id> <context_ref> <reason…> | outcome <id> <target_ref> <success|failure|unknown|not_executed> [--evidence <ref>]";
   if (!kind || !id) die(usage, 2);
   let r: { memoryId: string; kind: string; alreadyRecorded: boolean };
   if (kind === "applied") {
@@ -1235,7 +1235,7 @@ function resolvedEntry(where: string, id: string) {
 }
 
 /**
- * `continuity profiles [list|migrate-preview]` — the registry and the migration preview are
+ * `kontinuity profiles [list|migrate-preview]` — the registry and the migration preview are
  * descriptive and read-only (core/hygiene.ts discipline): nothing is moved, renamed or written.
  * A physical migration happens only after the owner reviews this preview and approves it
  * (README: changing an ID does not migrate memory — IDs never move silently).
@@ -1278,7 +1278,7 @@ async function cmdProfiles(a: Args) {
         "Resolved in this checkout:",
         resolvedText,
         "",
-        "Run 'continuity profiles migrate-preview' to see what an owner-approved physical migration would change.",
+        "Run 'kontinuity profiles migrate-preview' to see what an owner-approved physical migration would change.",
       ].join("\n");
       return out(a, human, { readOnly: true, kinds: PROFILE_KINDS, aliases: PROFILE_ALIASES, resolved: entries, unregistered });
     }
@@ -1356,13 +1356,13 @@ async function cmdGit(a: Args) {
   if (sub === "prepare-commit-msg") {
     try {
       const r = await prepareCommitMsg({ cwd: process.cwd(), msgFile: msgFile ?? "", source, sessionId: a.session ?? process.env.CONTINUITY_SESSION });
-      if (r.skipped) process.stderr.write(`continuity: ${r.skipped} applied record id(s) not written as trailers (not safe tokens); nothing else was added\n`);
+      if (r.skipped) process.stderr.write(`kontinuity: ${r.skipped} applied record id(s) not written as trailers (not safe tokens); nothing else was added\n`);
     } catch (e) {
-      process.stderr.write(`continuity: prepare-commit-msg: ${errText(e)}\n`);
+      process.stderr.write(`kontinuity: prepare-commit-msg: ${errText(e)}\n`);
     }
     return; // never fail a commit
   }
-  return die("usage: continuity git install-hooks | prepare-commit-msg <msgfile> [source]", 2);
+  return die("usage: kontinuity git install-hooks | prepare-commit-msg <msgfile> [source]", 2);
 }
 
 async function cmdStatus(rt: Runtime, a: Args, sessionId: string) {
@@ -1403,7 +1403,7 @@ async function cmdStatus(rt: Runtime, a: Args, sessionId: string) {
 
 // ---------- Keon MCP Gateway transport (core/gateway-client.ts) ----------
 
-const GATEWAY_HELP = `usage: continuity gateway <op> [args]  — Keon MCP Gateway transport (MCP tools/call)
+const GATEWAY_HELP = `usage: kontinuity gateway <op> [args]  — Keon MCP Gateway transport (MCP tools/call)
 
   login [--endpoint URL] [--api-key KEY | --bearer] [--tenant ID] [--actor ID] [--profile ID] [--no-verify]
                               enroll THIS machine: prove a Gateway-issued machine credential read-only
@@ -1434,7 +1434,7 @@ const GATEWAY_HELP = `usage: continuity gateway <op> [args]  — Keon MCP Gatewa
                               proposal is reported. They are never turned into a plain write.
   close                       ALWAYS refused (fails closed): its closure text would be a guess here; use supersede
   project <sub…>              the Project/1 registry over this transport (TASK-136): same subcommands as
-                              continuity project (list|show|create|bind-workspace|grants|rigor|archive|migrate).
+                              kontinuity project (list|show|create|bind-workspace|grants|rigor|archive|migrate).
                               Reads via keon.cortex.memory.search.v1; publish/revise via one atomic
                               keon.cortex.curation.batch.v1 item (approve carries the unique keys;
                               supersede is the compare-and-swap). migrate lists without --user-confirmed.
@@ -1446,7 +1446,7 @@ Profile: every call carries a profile_id from "gatewayProfileId" (config), the s
 locally. Identity and profile never come from arguments. No direct hosted-Cortex fallback: the legacy CortexClient is the
 local dev path, and once a gateway endpoint is configured the ordinary commands use this transport or fail closed.`;
 
-/** `continuity gateway login` — interactive enrollment into the secure credential store (TASK-196). */
+/** `kontinuity gateway login` — interactive enrollment into the secure credential store (TASK-196). */
 async function cmdGatewayLogin(a: Args): Promise<void> {
   try {
     const r = await loginGateway({
@@ -1482,7 +1482,7 @@ async function cmdGatewayLogin(a: Args): Promise<void> {
   }
 }
 
-/** `continuity gateway logout` — remove this machine's enrollment (the Gateway-side revocation is the operator's step). */
+/** `kontinuity gateway logout` — remove this machine's enrollment (the Gateway-side revocation is the operator's step). */
 async function cmdGatewayLogout(a: Args): Promise<void> {
   try {
     const r = logoutGateway();
@@ -1502,7 +1502,7 @@ async function cmdGatewayLogout(a: Args): Promise<void> {
   }
 }
 
-/** `continuity gateway status` — what would a call use right now, and where did it come from? Never the secret. */
+/** `kontinuity gateway status` — what would a call use right now, and where did it come from? Never the secret. */
 function cmdGatewayStatus(a: Args): void {
   const s = gatewayStatus();
   const lines = [
@@ -1545,8 +1545,8 @@ async function cmdGateway(a: Args): Promise<void> {
     return die(errText(e), 5);
   }
   const [op0, ...rest] = a.rest;
-  // Deprecated alias (one release, TASK-78): `continuity gateway passport` is hidden from help but still runs.
-  if (op0 === "passport") noteDeprecated("continuity gateway passport", "continuity gateway briefing");
+  // Deprecated alias (one release, TASK-78): `kontinuity gateway passport` is hidden from help but still runs.
+  if (op0 === "passport") noteDeprecated("kontinuity gateway passport", "kontinuity gateway briefing");
   const op = op0 === "passport" ? "briefing" : op0;
   try {
     switch (op) {
@@ -1557,24 +1557,24 @@ async function cmdGateway(a: Args): Promise<void> {
       case "briefing": {
         const p = await client.briefing({ limit: 40 });
         const lines = p.results.map((r) => `- ${r.content}`);
-        return out(a, [`## Continuity briefing — via ${endpoint} (keon.cortex.memory.recall.v1, kind: briefing)`, ...lines].join("\n"), p);
+        return out(a, [`## Kontinuity briefing — via ${endpoint} (keon.cortex.memory.recall.v1, kind: briefing)`, ...lines].join("\n"), p);
       }
       case "recall": {
         const query = rest.join(" ").trim();
-        if (!query) return die("usage: continuity gateway recall <query…>", 2);
+        if (!query) return die("usage: kontinuity gateway recall <query…>", 2);
         const r = await client.recall(query);
         return out(a, r.results.map((hit) => `- ${hit.content}`).join("\n"), r);
       }
       case "remember": {
         requireConfirmed(a, "remember");
         const text = rest.join(" ").trim();
-        if (!text) return die("usage: continuity gateway remember <text…> --user-confirmed", 2);
+        if (!text) return die("usage: kontinuity gateway remember <text…> --user-confirmed", 2);
         const w = await client.remember({ content: text, userConfirmed: true });
         return out(a, `written via keon.cortex.memory.write.v1 · shard ${short(w.shard_id)} · decision ${short(w.decision_id)}\nNOTE: the gateway surface has no curation promotion — this record was written, NOT "shared with every agent" (share/supersede/close are refused on this transport).`, w);
       }
       case "stage": {
         const text = rest.join(" ").trim();
-        if (!text) return die("usage: continuity gateway stage <text…>", 2);
+        if (!text) return die("usage: kontinuity gateway stage <text…>", 2);
         const w = await client.stage({ content: text });
         return out(a, `staged via keon.cortex.memory.write.v1 · shard ${short(w.shard_id)} (the write receipt is the whole truth on this transport)`, w);
       }
@@ -1584,14 +1584,14 @@ async function cmdGateway(a: Args): Promise<void> {
         try {
           event = JSON.parse(raw) as Record<string, unknown>;
         } catch {
-          return die("usage: continuity gateway feedback <json>  (one JSON object; stdin works too)", 2);
+          return die("usage: kontinuity gateway feedback <json>  (one JSON object; stdin works too)", 2);
         }
         const f = await client.feedback(event);
         return out(a, `event recorded via keon.cortex.memory.feedback.v1 · ${f.event_ids.join(", ")} (replayed: ${f.replayed})`, f);
       }
       case "proposals": {
         const status = rest[0];
-        if (status !== undefined && status !== "pending" && status !== "approved" && status !== "rejected") return die("usage: continuity gateway proposals [pending|approved|rejected]", 2);
+        if (status !== undefined && status !== "pending" && status !== "approved" && status !== "rejected") return die("usage: kontinuity gateway proposals [pending|approved|rejected]", 2);
         const l = await client.listProposals(status ? { status } : {});
         const lines = l.proposals.map((p) => `- ${String(p.proposal_id ?? p.id ?? "?")}  ${String(p.status ?? "?")}  ${String(p.kind ?? "")}`.trimEnd());
         return out(a, [`${l.proposals.length} proposal(s) via keon.cortex.curation.list.v1${l.next_cursor ? " (more: a next_cursor exists)" : ""}`, ...lines].join("\n"), l);
@@ -1634,7 +1634,7 @@ async function readStdin(): Promise<string> {
   return Buffer.concat(chunks).toString("utf8").trim();
 }
 
-const PROJECT_HELP = `continuity project <list|show|create|bind-workspace|grants|rigor|archive|migrate>
+const PROJECT_HELP = `kontinuity project <list|show|create|bind-workspace|grants|rigor|archive|migrate>
 
   Project/1 instances. Profile aliases (actor_me → proj_me, proj_north_star) are unchanged
   and cannot be minted as instances. --project on other commands still selects a profile.
@@ -1735,14 +1735,14 @@ async function cmdProject(rt: Runtime, a: Args, transportOverride?: ProjectRecor
         return out(a, records.map(formatProject).join("\n") || "(no projects)", { projects });
       }
       case "show": {
-        if (!ref) return die("usage: continuity project show <id-or-slug>", 2);
+        if (!ref) return die("usage: kontinuity project show <id-or-slug>", 2);
         const record = await registry.open(caller, ref);
         return out(a, formatProject(record), projectView(record));
       }
       case "create": {
         const title = cliFlag(a.rest, "--title");
         const slug = cliFlag(a.rest, "--slug");
-        if (!title || !slug) return die("usage: continuity project create --title <text> --slug <slug> [--workspace none|pending|bound] --user-confirmed", 2);
+        if (!title || !slug) return die("usage: kontinuity project create --title <text> --slug <slug> [--workspace none|pending|bound] --user-confirmed", 2);
         const workspaceFlag = cliFlag(a.rest, "--workspace") ?? "none";
         const rigor = cliFlag(a.rest, "--rigor");
         let workspace: { state: "none" } | { state: "pending" } | { state: "bound"; path: string };
@@ -1767,13 +1767,13 @@ async function cmdProject(rt: Runtime, a: Args, transportOverride?: ProjectRecor
         return out(a, line, { ...projectView(created.record), bindingOk: created.bindingOk, bindingReason: created.bindingReason });
       }
       case "bind-workspace": {
-        if (!ref || !a.path) return die("usage: continuity project bind-workspace <id-or-slug> --path <git-root> --expected-revision <n> --user-confirmed", 2);
+        if (!ref || !a.path) return die("usage: kontinuity project bind-workspace <id-or-slug> --path <git-root> --expected-revision <n> --user-confirmed", 2);
         const bound = await registry.bindWorkspace({ caller, projectRef: ref, path: a.path, expectedRevision: revision(), confirmed: a.userConfirmed });
         const line = formatProject(bound.record) + (bound.bindingOk ? "" : `\n  workspace left pending: ${bound.bindingReason ?? "not a git repository"}`);
         return out(a, line, { ...projectView(bound.record), bindingOk: bound.bindingOk, bindingReason: bound.bindingReason });
       }
       case "grants": {
-        if (!ref) return die("usage: continuity project grants <id-or-slug> --grant <id> --expected-revision <n> --user-confirmed", 2);
+        if (!ref) return die("usage: kontinuity project grants <id-or-slug> --grant <id> --expected-revision <n> --user-confirmed", 2);
         const record = await registry.setGrants({
           caller,
           projectRef: ref,
@@ -1785,12 +1785,12 @@ async function cmdProject(rt: Runtime, a: Args, transportOverride?: ProjectRecor
       }
       case "rigor": {
         const rigor = cliFlag(a.rest, "--rigor");
-        if (!ref || (rigor !== "T0" && rigor !== "T1" && rigor !== "T2")) return die("usage: continuity project rigor <id-or-slug> --rigor T0|T1|T2 --expected-revision <n> --user-confirmed", 2);
+        if (!ref || (rigor !== "T0" && rigor !== "T1" && rigor !== "T2")) return die("usage: kontinuity project rigor <id-or-slug> --rigor T0|T1|T2 --expected-revision <n> --user-confirmed", 2);
         const record = await registry.setRigor({ caller, projectRef: ref, expectedRevision: revision(), defaultRigor: rigor, confirmed: a.userConfirmed });
         return out(a, formatProject(record), projectView(record));
       }
       case "archive": {
-        if (!ref) return die("usage: continuity project archive <id-or-slug> --expected-revision <n> --user-confirmed", 2);
+        if (!ref) return die("usage: kontinuity project archive <id-or-slug> --expected-revision <n> --user-confirmed", 2);
         const record = await registry.archive({ caller, projectRef: ref, expectedRevision: revision(), confirmed: a.userConfirmed });
         return out(a, formatProject(record), projectView(record));
       }
@@ -1816,7 +1816,7 @@ async function cmdProject(rt: Runtime, a: Args, transportOverride?: ProjectRecor
   }
 }
 
-const HELP = `continuity [--as <runtime>] [--project <profile>] [--session <id>] [--json] <command>
+const HELP = `kontinuity [--as <runtime>] [--project <profile>] [--session <id>] [--json] <command>
 
 Shared memory
   briefing [--ids | --as-of DATE | --clipboard]
@@ -1852,13 +1852,13 @@ async function main() {
     try { return process.stdout.write(`${packageVersion()}\n`); } catch (e) { return die(errText(e), 1); }
   }
   if (a.help) {
-    const help = a.cmd === "project" || (a.cmd === "gateway" && a.rest[0] === "project") ? PROJECT_HELP : a.cmd === "gateway" ? GATEWAY_HELP : a.cmd === "demo" ? "usage: continuity demo [--json]\n\nRun a synthetic handoff entirely in memory." : a.cmd === "status" && !process.argv.slice(2).includes("status") ? HELP : `usage: continuity ${a.cmd} [options]\n\n${HELP}`;
+    const help = a.cmd === "project" || (a.cmd === "gateway" && a.rest[0] === "project") ? PROJECT_HELP : a.cmd === "gateway" ? GATEWAY_HELP : a.cmd === "demo" ? "usage: kontinuity demo [--json]\n\nRun a synthetic handoff entirely in memory." : a.cmd === "status" && !process.argv.slice(2).includes("status") ? HELP : `usage: kontinuity ${a.cmd} [options]\n\n${HELP}`;
     return process.stdout.write(`${help}\n`);
   }
   if (a.cmd === "help") return process.stdout.write(`${HELP}\n`);
   if (a.cmd === "prompt") return process.stdout.write(`${EXTRACTION_PROMPT}\n`);
   if (a.cmd === "demo") {
-    if (a.rest.length) return die("usage: continuity demo [--json]", 2);
+    if (a.rest.length) return die("usage: kontinuity demo [--json]", 2);
     const { runHandoffDemo, renderHandoffDemo } = await import("../core/demo.ts");
     try {
       const result = await runHandoffDemo();
@@ -1881,7 +1881,7 @@ async function main() {
   // gateway enrollment, never from --as or tool arguments (core/gateway-client.ts G-1).
   if (a.cmd === "gateway") return await cmdGateway(a);
   if (!a.as?.trim() && !process.env.CONTINUITY_RUNTIME?.trim()) {
-    return die("Pass --as <runtime> or set CONTINUITY_RUNTIME. Continuity requires an explicit agent identity.", 2);
+    return die("Pass --as <runtime> or set CONTINUITY_RUNTIME. Kontinuity requires an explicit agent identity.", 2);
   }
   const runtimeName = normalizeRuntimeName(a.as);
   let rt: Runtime;
@@ -1891,8 +1891,8 @@ async function main() {
     return die(`not configured: ${errText(e)}`, 5);
   }
   const sessionId = sessionIdFor(a, runtimeName);
-  // Deprecated alias (one release, TASK-78): `continuity passport` is hidden from help but still runs.
-  if (a.cmd === "passport") { noteDeprecated("continuity passport", "continuity briefing"); a.cmd = "briefing"; }
+  // Deprecated alias (one release, TASK-78): `kontinuity passport` is hidden from help but still runs.
+  if (a.cmd === "passport") { noteDeprecated("kontinuity passport", "kontinuity briefing"); a.cmd = "briefing"; }
   try {
     switch (a.cmd) {
       case "briefing": return await cmdBriefing(rt, a, sessionId);

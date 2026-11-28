@@ -31,7 +31,7 @@ export function loadControl(tenantId: string): ControlState {
     return { version: 1, capturePaused: raw.capturePaused === true, pausedAt: raw.pausedAt, pausedBy: raw.pausedBy, reason: raw.reason };
   } catch {
     // Unreadable control file: fail toward NOT capturing. A broken pause switch must not silently capture.
-    return { version: 1, capturePaused: true, reason: "control file unreadable; capture held until `continuity resume`" };
+    return { version: 1, capturePaused: true, reason: "control file unreadable; capture held until `kontinuity resume`" };
   }
 }
 
@@ -49,7 +49,7 @@ export function setCapturePaused(tenantId: string, paused: boolean, by: string, 
 
 export class CapturePausedError extends Error {
   constructor(state: ControlState) {
-    super(`capture is paused${state.pausedAt ? ` since ${state.pausedAt}` : ""}${state.reason ? ` (${state.reason})` : ""}. Nothing was captured. Resume with \`continuity resume\`; explicit \`remember --user-confirmed\` still works.`);
+    super(`capture is paused${state.pausedAt ? ` since ${state.pausedAt}` : ""}${state.reason ? ` (${state.reason})` : ""}. Nothing was captured. Resume with \`kontinuity resume\`; explicit \`remember --user-confirmed\` still works.`);
     this.name = "CapturePausedError";
   }
 }

@@ -9,7 +9,7 @@ export interface ContinuityConfig {
   /**
    * Keon MCP Gateway endpoint (TASK-82), e.g. "http://localhost:5000/mcp". Empty (default) = the
    * gateway transport is off and the local direct-Cortex dev path runs unchanged. When set, the
-   * `continuity gateway …` commands speak MCP to the gateway; the machine credential comes from
+   * `kontinuity gateway …` commands speak MCP to the gateway; the machine credential comes from
    * KEON_MCP_BEARER_TOKEN or KEON_MCP_API_KEY + KEON_MCP_TENANT_ID + KEON_MCP_ACTOR_ID (gateway
    * enrollment) — identity is never taken from tool arguments (core/gateway-client.ts G-1).
    */

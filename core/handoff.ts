@@ -1,5 +1,5 @@
 /**
- * Baton / handoff records: `continuity handoff --to <runtime> <text>` maps onto the Cortex
+ * Baton / handoff records: `kontinuity handoff --to <runtime> <text>` maps onto the Cortex
  * `handoff` curation kind (shards/1.1). The contract, verified in smoke/smoke.ts §9 against
  * the live protocol:
  *

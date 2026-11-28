@@ -705,7 +705,7 @@ export async function claimTask(rt: Runtime, sessionId: string, n: number, by = 
   if (unmet.length) throw new BoardError(`${taskId(n)} is BLOCKED-ON ${unmet.map(taskId).join(", ")} (not DONE yet)`, "DEPENDENCY_UNRESOLVED");
   if (t.waitingOn.length) {
     throw new BoardError(
-      `${taskId(n)} is waiting on: ${t.waitingOn.map(waitToken).join(", ")} — not claimable until the user clears it (\`continuity task unblock ${n} --user-confirmed\`)`,
+      `${taskId(n)} is waiting on: ${t.waitingOn.map(waitToken).join(", ")} — not claimable until the user clears it (\`kontinuity task unblock ${n} --user-confirmed\`)`,
       t.waitingOn.includes("user") ? "EXECUTION_HELD" : "DEPENDENCY_UNRESOLVED",
     );
   }
@@ -762,7 +762,7 @@ export async function unblockTask(
   const touchesHoldGate = refs === undefined || refs.some((r) => typeof r === "string" && r.toLowerCase() === "user");
   if (heldContract?.executionState === "held" && touchesHoldGate) {
     throw new BoardError(
-      `${taskId(n)} is execution-held — its USER gate is the execution hold's projection, and the activation card is the only way to clear the hold (\`continuity task activate ${n} worker|human\` / POST /api/board/activate). Nothing was cleared; after activation, any remaining source gate clears with unblock as always.`,
+      `${taskId(n)} is execution-held — its USER gate is the execution hold's projection, and the activation card is the only way to clear the hold (\`kontinuity task activate ${n} worker|human\` / POST /api/board/activate). Nothing was cleared; after activation, any remaining source gate clears with unblock as always.`,
       "EXECUTION_HELD",
     );
   }
@@ -1207,7 +1207,7 @@ export function formatBoard(board: Board, opts: { ids?: boolean; done?: boolean;
   const out: string[] = [];
   const open = groups.available.length + groups.claimed.length + groups.waiting.length + groups.blocked.length + groups.backlog.length;
   // An all-done board is a statement, not a bare DONE summary that reads like the board failed.
-  if (open === 0) out.push(`no open tasks — all ${groups.done.length + groups.archive.length} DONE${opts.done ? "" : " (hidden — \`/cb done\` (or \`continuity task board --done\`) to list)"}`);
+  if (open === 0) out.push(`no open tasks — all ${groups.done.length + groups.archive.length} DONE${opts.done ? "" : " (hidden — \`/cb done\` (or \`kontinuity task board --done\`) to list)"}`);
   const sec = (title: string, lines: string[]) => lines.length && out.push(`${title} (${lines.length})`, ...lines);
   sec("AVAILABLE", groups.available);
   sec("CLAIMED", groups.claimed);
@@ -1215,11 +1215,11 @@ export function formatBoard(board: Board, opts: { ids?: boolean; done?: boolean;
   sec("BLOCKED", groups.blocked);
   sec("BACKLOG", groups.backlog);
   if (opts.done) sec("ARCHIVE", groups.archive);
-  else if (groups.archive.length) out.push(`ARCHIVE (${groups.archive.length}) hidden — \`continuity task board --done\` to list`);
+  else if (groups.archive.length) out.push(`ARCHIVE (${groups.archive.length}) hidden — \`kontinuity task board --done\` to list`);
   // DONE history grows forever and drowns the actionable columns: summarize by default, list on request.
   if (opts.done) sec("DONE", groups.done);
-  else if (open > 0 && groups.done.length) out.push(`DONE (${groups.done.length}) hidden — \`/cb done\` (or \`continuity task board --done\`) to list`);
-  if (board.truncated) out.push("(board may be incomplete: Cortex capped the search; verify a task with `continuity recall TASK-nn` before relying on this)");
+  else if (open > 0 && groups.done.length) out.push(`DONE (${groups.done.length}) hidden — \`/cb done\` (or \`kontinuity task board --done\`) to list`);
+  if (board.truncated) out.push("(board may be incomplete: Cortex capped the search; verify a task with `kontinuity recall TASK-nn` before relying on this)");
   return out.join("\n");
 }
 

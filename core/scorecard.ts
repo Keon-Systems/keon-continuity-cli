@@ -248,7 +248,7 @@ export function formatScorecard(s: Scorecard): string {
   const src = (k: MetricSource) => `${k} ${d.bySource[k].withRecords}/${d.bySource[k].runs}`;
   const oldest = o.oldestAgeDays === null ? DASH : `${num(o.oldestAgeDays, 2)}d`;
   return [
-    `continuity scorecard — window ${s.window.from.slice(0, 10)} → ${s.window.to.slice(0, 10)} (${s.window.days} days) · ${s.events} metric event(s) recorded locally`,
+    `kontinuity scorecard — window ${s.window.from.slice(0, 10)} → ${s.window.to.slice(0, 10)} (${s.window.days} days) · ${s.events} metric event(s) recorded locally`,
     ``,
     `retrieval rate          ${pct(d.retrievalRate)}  (${d.withRecords} of ${d.runs} delivery runs carried ≥1 record)`,
     `  ${SOURCES.map(src).join(" · ")}`,

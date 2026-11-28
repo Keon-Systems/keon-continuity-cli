@@ -1,5 +1,5 @@
 /**
- * Clipboard copy for the web-chat bridge: `continuity briefing --clipboard` puts the briefing on
+ * Clipboard copy for the web-chat bridge: `kontinuity briefing --clipboard` puts the briefing on
  * the clipboard so the user can paste it into claude.ai / ChatGPT / Gemini, where the CLI cannot
  * run. Detection is best-effort across platforms; `CONTINUITY_CLIPBOARD` overrides it (a command
  * run via `sh -c` that reads the text from stdin) so tests and headless setups are deterministic.
@@ -45,5 +45,5 @@ export function copyToClipboard(text: string): { tool: string } {
     }
     return { tool };
   }
-  throw new ClipboardError(`no clipboard tool worked (tried: ${tried.join(", ")}). Install one (wl-copy, xclip, xsel, pbcopy) or copy manually from \`continuity briefing\`.`);
+  throw new ClipboardError(`no clipboard tool worked (tried: ${tried.join(", ")}). Install one (wl-copy, xclip, xsel, pbcopy) or copy manually from \`kontinuity briefing\`.`);
 }

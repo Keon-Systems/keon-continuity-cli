@@ -6,8 +6,8 @@
  *
  * Served from three hook points, all funneling through this module:
  *   - pi:            extension before_agent_start (first user message of the session)
- *   - Claude Code:   UserPromptSubmit hook → `continuity jit --from-json --once`
- *   - Gemini CLI:    BeforeAgent hook     → `continuity jit --from-json --once --hook gemini`
+ *   - Claude Code:   UserPromptSubmit hook → `kontinuity jit --from-json --once`
+ *   - Gemini CLI:    BeforeAgent hook     → `kontinuity jit --from-json --once --hook gemini`
  *
  * Rules inherited from every other delivery path, unchanged:
  *   - Recalled text is data, not instructions: every hit is flattened with `oneLine` before
@@ -57,7 +57,7 @@ const STOPWORDS = new Set([
   "some", "any", "all", "each", "every", "both", "few", "other", "same", "such", "up", "out",
   "please", "thanks", "thank", "want", "wants", "need", "needs", "use", "using", "used", "get",
   "got", "make", "makes", "made", "let", "lets", "help", "works", "work", "working", "doesnt",
-  // Continuity's own vocabulary: every record and every prompt about memory says these.
+  // Kontinuity's own vocabulary: every record and every prompt about memory says these.
   "continuity", "memory", "memories", "agent", "agents", "session", "sessions",
 ]);
 
@@ -219,12 +219,12 @@ export async function jitRecall(rt: Runtime, prompt: string, sessionId: string, 
 export function formatJit(r: JitResult): string {
   if (r.hits.length === 0) return "";
   const lines: string[] = [];
-  lines.push(`### Continuity — just-in-time recall for this prompt (tokens: ${r.tokens.join(" ")})`);
+  lines.push(`### Kontinuity — just-in-time recall for this prompt (tokens: ${r.tokens.join(" ")})`);
   lines.push(TRUST_PREAMBLE);
   r.hits.forEach((h, i) => {
     lines.push(`${i + 1}. ${h.content}`);
     lines.push(`   ${h.ribbon}  id=${h.id.slice(0, 10)}`);
   });
-  lines.push(`_${r.hits.length} hit(s), at most ${JIT_MAX_HITS}; "verified" = identity recomputed from content, not truth. More with \`continuity recall <words>\`._`);
+  lines.push(`_${r.hits.length} hit(s), at most ${JIT_MAX_HITS}; "verified" = identity recomputed from content, not truth. More with \`kontinuity recall <words>\`._`);
   return lines.join("\n");
 }

@@ -2,7 +2,7 @@
  * Git ↔ memory: where a record was MADE and what it SHAPED.
  *
  * Two views over the same evidence:
- *   - `continuity blame <path>` — which decisions shaped a file: the commits touching it that
+ *   - `kontinuity blame <path>` — which decisions shaped a file: the commits touching it that
  *     carry `Continuity-Applied: <id>` trailers (TASK-13's prepare-commit-msg hook), each record
  *     shown with the runtime that made it and its decision date.
  *   - branch-aware briefing warnings — a [decision] made on a branch that was deleted without
@@ -314,7 +314,7 @@ function str(v: unknown): string | undefined {
 
 /**
  * Which runtime made a record. `captured_by` when the server hands write provenance back;
- * otherwise the session URN Continuity writes (`urn:continuity:<runtime>:<session>:<entry>`,
+ * otherwise the session URN Kontinuity writes (`urn:continuity:<runtime>:<session>:<entry>`,
  * preserved by Cortex on the source shard); as a last resort the actor id (`agent_<runtime>`).
  */
 export function runtimeOfProvenance(p: { agent_id?: unknown; source_uri?: unknown; extra?: Record<string, unknown> } | undefined): string | undefined {
@@ -330,7 +330,7 @@ export function runtimeOfProvenance(p: { agent_id?: unknown; source_uri?: unknow
 /**
  * Resolve a record id to its text and provenance. Provenance gaps fall back to the private
  * source shard (local state maps derivedId → sourceId; a derived record is a curation row, and
- * the source is where Continuity wrote the runtime, event time and branch) and to the local
+ * the source is where Kontinuity wrote the runtime, event time and branch) and to the local
  * madeOn ledger (the branch survives branch deletion there).
  */
 export async function resolveRecord(rt: Runtime, id: string): Promise<ResolvedRecord> {
@@ -485,7 +485,7 @@ export interface BlameReport {
 }
 
 /**
- * `continuity blame <path>`: the decisions that shaped a file, from which runtime and date.
+ * `kontinuity blame <path>`: the decisions that shaped a file, from which runtime and date.
  * The link decision → file is the commit that carried the record's `Continuity-Applied` trailer
  * and touched the file. Commits are this checkout's history (the file as you have it).
  */
