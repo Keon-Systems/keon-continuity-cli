@@ -63,7 +63,7 @@ kontinuity --as codex --project proj_example briefing
 kontinuity --as codex --project proj_example recall "retry limit"
 ~~~
 
-If you configure an MCP desktop client, launch `continuity --as YOUR_RUNTIME --project proj_example mcp` as its stdio server. Your runtime and project are fixed at launch. Run `continuity --help` for the command list and `continuity gateway help` for Gateway-specific tools and setup.
+If you configure an MCP desktop client, launch `kontinuity --as YOUR_RUNTIME --project proj_example mcp` as its stdio server. Your runtime and project are fixed at launch. Run `kontinuity --help` for the command list and `kontinuity gateway help` for Gateway-specific tools and setup.
 
 ## Development
 

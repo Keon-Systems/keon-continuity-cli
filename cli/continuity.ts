@@ -1472,8 +1472,8 @@ async function cmdGatewayLogin(a: Args): Promise<void> {
         `  config.json  wrote ${r.configKeys.join(", ")}`,
         "",
         "Ordinary continuity commands on this machine now use the Gateway transport (no direct-Cortex fallback).",
-        "  check:   continuity gateway status",
-        "  undo:    continuity gateway logout",
+        "  check:   kontinuity gateway status",
+        "  undo:    kontinuity gateway logout",
       ].join("\n"),
       r,
     );
