@@ -1,8 +1,16 @@
 # Hosted handoff release gate for v0.2.0
 
-The CLI fixes and credential-free demo are merged. The hosted handoff is blocked on the Gateway owner. Keep the tag and release unpublished until this check passes. [CLI changes](https://github.com/Keon-Systems/keon-kontinuity-cli/pull/2)
+The hosted handoff passed on November 28, 2026, on Gateway revision `keon-mcp-gateway--0000054` in the isolated profile `proj_cli_v020_handoff`. Distinct writer, reader, and owner enrollments performed the test. The writer recalled the private shard, the reader saw zero matches before approval, and the owner approved the writer's proposal. A fresh reader then recalled the derived shared shard. The two previous reader and owner test keys were rejected as revoked.
 
-## Unblock in this order
+| Evidence | Reference |
+| --- | --- |
+| Private source shard | `87a9d790a1a4de0238b139600ce0b0d11598bc769195100636666f159c1350cd` |
+| Writer proposal | `d8acd61d1f815c0d0c7c16660ee02ac9a929cfa9458fd5cd06a8e5404d25455e` |
+| Owner disposition | `258e3c73638b115acd00ddd3bf1dfa356b682032016d022c1af77afc212e1d47` |
+| Derived shared shard | `57f10fb72af77877651da20984cd66eec7ab19d38f9404fda791dc4333f0ee4a` |
+| Reader recall event | `bce37dff9709cee6dea4dce9d6372064ddf2d678988c87ba8d358b0c1191d9a8` |
+
+## Prepare a future verification run
 
 1. **Fix the hosted Gateway deployment.** The owner restores the public MCP endpoint. Confirm that an authenticated test client can initialize and list the memory and curation tools through that endpoint.
 2. **Give the writer and reader distinct roles on one isolated project.** The owner provisions two keys and their enrollment rows. Each row has its own actor and a distinct `RoleId`. Both target the same isolated `proj_…` profile. The writer can stage a private record and propose sharing it. The reader can read shared memory in the test project.

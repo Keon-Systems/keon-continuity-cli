@@ -10,7 +10,7 @@ The product is Kontinuity. The npm package is `@keon-systems/kontinuity-cli`. Th
 
 Use Node.js 22.18 or newer on Linux, macOS, or Windows.
 
-Release downloads are not yet published. The repository has no GitHub releases or tags yet. The v0.2.0 release stays unpublished until the [hosted handoff release gate](docs/hosted-release-verification.md) passes. Build from source to try the CLI today.
+Download the v0.2.0 tarball and its SHA-256 checksum from [GitHub Releases](https://github.com/Keon-Systems/keon-kontinuity-cli/releases/tag/v0.2.0), or build from source below. The [hosted handoff verification](docs/hosted-release-verification.md) records the reader, writer, and owner check.
 
 ### Build from source
 
